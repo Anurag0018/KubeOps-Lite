@@ -138,8 +138,8 @@ export default function Namespaces() {
           '&:hover': {
             transform: 'translateY(-4px)',
             boxShadow: theme.palette.mode === 'dark' 
-              ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-              : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+              ? `0 12px 20px -10px ${theme.palette.primary.main}40, 0 4px 20px 0 rgba(0, 0, 0, 0.3)` 
+              : `0 12px 20px -10px ${theme.palette.primary.main}20, 0 4px 20px 0 rgba(0, 0, 0, 0.05)`,
             borderColor: 'primary.main',
           }
         }}

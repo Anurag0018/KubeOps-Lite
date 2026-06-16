@@ -556,18 +556,21 @@ const NeuralSphere = () => {
 
 
 // Animated wave equalizer lines
-const EqualizerIcon = () => (
-  <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '12px', width: '14px' }}>
-    <style>{`
-      @keyframes eqBar1 { 0%, 100% { height: 3px; } 50% { height: 12px; } }
-      @keyframes eqBar2 { 0%, 100% { height: 10px; } 50% { height: 5px; } }
-      @keyframes eqBar3 { 0%, 100% { height: 5px; } 50% { height: 10px; } }
-    `}</style>
-    <Box sx={{ width: '2px', backgroundColor: '#3b82f6', borderRadius: '1px', animation: 'eqBar1 0.8s ease-in-out infinite' }} />
-    <Box sx={{ width: '2px', backgroundColor: '#3b82f6', borderRadius: '1px', animation: 'eqBar2 0.6s ease-in-out infinite' }} />
-    <Box sx={{ width: '2px', backgroundColor: '#3b82f6', borderRadius: '1px', animation: 'eqBar3 1.0s ease-in-out infinite' }} />
-  </Box>
-);
+const EqualizerIcon = () => {
+  const theme = useTheme();
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '12px', width: '14px' }}>
+      <style>{`
+        @keyframes eqBar1 { 0%, 100% { height: 3px; } 50% { height: 12px; } }
+        @keyframes eqBar2 { 0%, 100% { height: 10px; } 50% { height: 5px; } }
+        @keyframes eqBar3 { 0%, 100% { height: 5px; } 50% { height: 10px; } }
+      `}</style>
+      <Box sx={{ width: '2px', backgroundColor: theme.palette.primary.main, borderRadius: '1px', animation: 'eqBar1 0.8s ease-in-out infinite' }} />
+      <Box sx={{ width: '2px', backgroundColor: theme.palette.primary.main, borderRadius: '1px', animation: 'eqBar2 0.6s ease-in-out infinite' }} />
+      <Box sx={{ width: '2px', backgroundColor: theme.palette.primary.main, borderRadius: '1px', animation: 'eqBar3 1.0s ease-in-out infinite' }} />
+    </Box>
+  );
+};
 
 export default function AllIntelligence() {
   const theme = useTheme();
@@ -576,7 +579,7 @@ export default function AllIntelligence() {
 
   const logColors = {
     timestamp: '#64748b',
-    info: '#3b82f6',
+    info: theme.palette.primary.main,
     success: isDark ? '#10b981' : '#059669',
     warn: isDark ? '#f59e0b' : '#d97706',
     message: isDark ? '#cbd5e1' : '#334155',
@@ -625,8 +628,8 @@ export default function AllIntelligence() {
             size="small"
             startIcon={<DescriptionRoundedIcon sx={{ fontSize: 16 }} />}
             sx={{
-              backgroundColor: '#3b82f6',
-              color: '#ffffff',
+              backgroundColor: 'primary.main',
+              color: 'primary.contrastText',
               fontWeight: 700,
               fontSize: '0.725rem',
               textTransform: 'none',
@@ -634,7 +637,7 @@ export default function AllIntelligence() {
               px: 2,
               py: 0.75,
               '&:hover': {
-                backgroundColor: '#2563eb',
+                backgroundColor: 'primary.dark',
               },
             }}
           >
@@ -664,8 +667,8 @@ export default function AllIntelligence() {
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: theme.palette.mode === 'dark' 
-                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                  ? `0 12px 20px -10px ${theme.palette.primary.main}40, 0 4px 20px 0 rgba(0, 0, 0, 0.3)` 
+                  : `0 12px 20px -10px ${theme.palette.primary.main}20, 0 4px 20px 0 rgba(0, 0, 0, 0.05)`,
                 borderColor: 'primary.main',
               }
             }}
@@ -680,11 +683,11 @@ export default function AllIntelligence() {
                   width: 52,
                   height: 52,
                   borderRadius: '10px',
-                  backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                  border: '1px solid rgba(59, 130, 246, 0.12)',
+                  backgroundColor: `${theme.palette.primary.main}14`,
+                  border: `1px solid ${theme.palette.primary.main}1f`,
                 }}
               >
-                <Typography variant="h5" sx={{ fontWeight: 800, color: '#3b82f6', fontSize: '1.35rem' }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main', fontSize: '1.35rem' }}>
                   94%
                 </Typography>
               </Box>
@@ -747,7 +750,7 @@ export default function AllIntelligence() {
                   <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.675rem', letterSpacing: '0.3px' }}>
                     RESOURCE OPTIMIZATION
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#3b82f6', fontWeight: 800, fontSize: '0.725rem' }}>
+                  <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.725rem' }}>
                     82% Efficient
                   </Typography>
                 </Box>
@@ -759,7 +762,7 @@ export default function AllIntelligence() {
                     borderRadius: 3,
                     backgroundColor: 'divider',
                     mb: 1.25,
-                    '& .MuiLinearProgress-bar': { backgroundColor: '#3b82f6', borderRadius: 3 },
+                    '& .MuiLinearProgress-bar': { backgroundColor: 'primary.main', borderRadius: 3 },
                   }}
                 />
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.7rem', lineHeight: 1.4, fontWeight: 500 }}>
@@ -771,7 +774,7 @@ export default function AllIntelligence() {
             {/* Bottom Actions section */}
             <Box sx={{ borderTop: '1px solid', borderColor: 'divider', pt: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                <OfflineBoltRoundedIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
+                <OfflineBoltRoundedIcon sx={{ color: 'primary.main', fontSize: 16 }} />
                 <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.75rem' }}>
                   AI Recommended Actions
                 </Typography>
@@ -839,7 +842,7 @@ export default function AllIntelligence() {
             {/* Bottom info section */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px solid', borderColor: 'divider', pt: 1.5 }}>
               <Box>
-                <Typography variant="body2" sx={{ color: '#3b82f6', fontWeight: 800, fontSize: '0.65rem', letterSpacing: '1px' }}>
+                <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.65rem', letterSpacing: '1px' }}>
                   NEURAL LINK
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.825rem', mt: 0.25 }}>
@@ -876,16 +879,16 @@ export default function AllIntelligence() {
               '&:hover': {
                 transform: 'translateY(-4px)',
                 boxShadow: theme.palette.mode === 'dark' 
-                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                  ? `0 12px 20px -10px ${theme.palette.primary.main}40, 0 4px 20px 0 rgba(0, 0, 0, 0.3)` 
+                  : `0 12px 20px -10px ${theme.palette.primary.main}20, 0 4px 20px 0 rgba(0, 0, 0, 0.05)`,
                 borderColor: 'primary.main',
               }
             }}
           >
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 1.75 }}>
-                <Box sx={{ p: 0.75, borderRadius: '8px', backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.12)', display: 'flex' }}>
-                  <InsightsRoundedIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
+                <Box sx={{ p: 0.75, borderRadius: '8px', backgroundColor: `${theme.palette.primary.main}14`, border: `1px solid ${theme.palette.primary.main}1f`, display: 'flex' }}>
+                  <InsightsRoundedIcon sx={{ color: 'primary.main', fontSize: 16 }} />
                 </Box>
                 <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.85rem' }}>
                   Anomaly Detection
@@ -900,7 +903,7 @@ export default function AllIntelligence() {
             <Box sx={{ mb: 2.25 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.625rem' }}>Confidence Score</Typography>
-                <Typography variant="caption" sx={{ color: '#3b82f6', fontWeight: 800, fontSize: '0.675rem' }}>98.4%</Typography>
+                <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.675rem' }}>98.4%</Typography>
               </Box>
               <LinearProgress
                 variant="determinate"
@@ -909,7 +912,7 @@ export default function AllIntelligence() {
                   height: 4,
                   borderRadius: 2,
                   backgroundColor: 'divider',
-                  '& .MuiLinearProgress-bar': { backgroundColor: '#3b82f6', borderRadius: 2 },
+                  '& .MuiLinearProgress-bar': { backgroundColor: 'primary.main', borderRadius: 2 },
                 }}
               />
             </Box>
@@ -1124,8 +1127,8 @@ export default function AllIntelligence() {
                   onChange={(e) => setAutoScroll(e.target.checked)}
                   size="small"
                   sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': { color: '#3b82f6' },
-                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#3b82f6' }
+                    '& .MuiSwitch-switchBase.Mui-checked': { color: theme.palette.primary.main },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: theme.palette.primary.main }
                   }}
                 />
               }

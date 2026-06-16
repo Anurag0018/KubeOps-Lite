@@ -21,20 +21,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CircleIcon from '@mui/icons-material/Circle';
 
-const initialEvents = [
-  { time: '2m', type: 'Warning', reason: 'BackOff', object: 'Pod/notifications-worker-341d-dff89', message: 'Back-off restarting failed container worker in pod notifications-worker' },
-  { time: '5m', type: 'Normal', reason: 'Scheduled', object: 'Pod/worker-node-03-7bf9c8d-aa11b', message: 'Successfully assigned background-jobs/worker-node-03-7bf9c8d-aa11b to node-03' },
-  { time: '12m', type: 'Normal', reason: 'Pulling', object: 'Pod/worker-node-03-7bf9c8d-aa11b', message: 'Pulling image "nginx:alpine"' },
-  { time: '15m', type: 'Normal', reason: 'ScaleUp', object: 'Deployment/frontend-web', message: 'Scaled up replica set frontend-web to 5' },
-  { time: '45m', type: 'Warning', reason: 'FailedMount', object: 'Pod/redis-master-0', message: 'MountVolume.SetUp failed for volume "redis-data" : conn refused' },
-  { time: '1h', type: 'Normal', reason: 'Created', object: 'Pod/redis-master-0', message: 'Created container redis-master' },
-  { time: '2h', type: 'Normal', reason: 'Started', object: 'Pod/redis-master-0', message: 'Started container redis-master' },
-  { time: '4h', type: 'Normal', reason: 'Pulled', object: 'Pod/auth-service-5c6d7e8f-xyz34', message: 'Successfully pulled image "auth-svc:v2.1.0" in 2.34s' },
-];
+import { useClusterStore } from '../store/clusterStore';
 
 export default function Events() {
   const theme = useTheme();
-  const [events] = useState(initialEvents);
+  const [storeState] = useClusterStore();
+  const events = storeState.events;
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
@@ -119,8 +111,8 @@ export default function Events() {
           '&:hover': {
             transform: 'translateY(-4px)',
             boxShadow: theme.palette.mode === 'dark' 
-              ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-              : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+              ? `0 12px 20px -10px ${theme.palette.primary.main}40, 0 4px 20px 0 rgba(0, 0, 0, 0.3)` 
+              : `0 12px 20px -10px ${theme.palette.primary.main}20, 0 4px 20px 0 rgba(0, 0, 0, 0.05)`,
             borderColor: 'primary.main',
           }
         }}
