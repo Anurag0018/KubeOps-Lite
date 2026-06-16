@@ -216,13 +216,35 @@ export default function Deployments() {
       <Grid container spacing={2}>
         {/* Card 1 */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2, position: 'relative', overflow: 'hidden' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2,
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              },
+              '&:hover .watermark-icon': {
+                transform: 'scale(1.15) translateY(-2px)',
+                opacity: theme.palette.mode === 'dark' ? 0.8 : 0.9,
+              }
+            }}
+          >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Active Deployments</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5, fontSize: '1.8rem' }}>18</Typography>
               </Box>
-              <AccountTreeRoundedIcon sx={{ color: 'primary.main', opacity: theme.palette.mode === 'dark' ? 0.6 : 0.7, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
+              <AccountTreeRoundedIcon className="watermark-icon" sx={{ color: 'primary.main', opacity: theme.palette.mode === 'dark' ? 0.6 : 0.7, fontSize: 36, position: 'absolute', right: 12, top: 12, transition: 'all 0.3s ease' }} />
             </Box>
             <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#10b981' : '#047857', fontSize: '0.675rem', fontWeight: 700, mt: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <CircleIcon sx={{ fontSize: 6, color: theme.palette.mode === 'dark' ? '#10b981' : '#047857' }} /> All systems operational
@@ -232,13 +254,35 @@ export default function Deployments() {
 
         {/* Card 2 */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2, position: 'relative', overflow: 'hidden' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2,
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(239, 68, 68, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(239, 68, 68, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'error.main',
+              },
+              '&:hover .watermark-icon': {
+                transform: 'scale(1.15) rotate(10deg)',
+                opacity: theme.palette.mode === 'dark' ? 0.8 : 0.9,
+              }
+            }}
+          >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Failed Deployments</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'error.main', mt: 0.5, fontSize: '1.8rem' }}>0</Typography>
               </Box>
-              <ErrorOutlineRoundedIcon sx={{ color: 'error.main', opacity: theme.palette.mode === 'dark' ? 0.6 : 0.7, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
+              <ErrorOutlineRoundedIcon className="watermark-icon" sx={{ color: 'error.main', opacity: theme.palette.mode === 'dark' ? 0.6 : 0.7, fontSize: 36, position: 'absolute', right: 12, top: 12, transition: 'all 0.3s ease' }} />
             </Box>
             <Chip
               label="-100% from yesterday"
@@ -259,13 +303,35 @@ export default function Deployments() {
 
         {/* Card 3 */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2, position: 'relative', overflow: 'hidden' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2,
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(245, 158, 11, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(245, 158, 11, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#f59e0b',
+              },
+              '&:hover .watermark-icon': {
+                transform: 'rotate(180deg) scale(1.15)',
+                opacity: theme.palette.mode === 'dark' ? 0.7 : 0.75,
+              }
+            }}
+          >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Rollouts Today</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5, fontSize: '1.8rem' }}>12</Typography>
               </Box>
-              <AutorenewRoundedIcon sx={{ color: 'text.primary', opacity: theme.palette.mode === 'dark' ? 0.5 : 0.55, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
+              <AutorenewRoundedIcon className="watermark-icon" sx={{ color: 'text.primary', opacity: theme.palette.mode === 'dark' ? 0.5 : 0.55, fontSize: 36, position: 'absolute', right: 12, top: 12, transition: 'all 0.4s ease' }} />
             </Box>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.675rem', fontWeight: 600, mt: 1.5 }}>
               Last rollout 14m ago
@@ -275,13 +341,35 @@ export default function Deployments() {
 
         {/* Card 4 */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2, position: 'relative', overflow: 'hidden' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2,
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              },
+              '&:hover .watermark-icon': {
+                transform: 'translateY(-3px) scale(1.15)',
+                opacity: theme.palette.mode === 'dark' ? 0.7 : 0.75,
+              }
+            }}
+          >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Average Replicas</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5, fontSize: '1.8rem' }}>4.2</Typography>
               </Box>
-              <Box sx={{ display: 'flex', gap: '3px', position: 'absolute', right: 16, top: 16, opacity: theme.palette.mode === 'dark' ? 0.5 : 0.55 }}>
+              <Box className="watermark-icon" sx={{ display: 'flex', gap: '3px', position: 'absolute', right: 16, top: 16, opacity: theme.palette.mode === 'dark' ? 0.5 : 0.55, transition: 'all 0.3s ease' }}>
                 <Box sx={{ width: 4, height: 20, backgroundColor: 'text.primary', borderRadius: 1 }} />
                 <Box sx={{ width: 4, height: 26, backgroundColor: 'text.primary', borderRadius: 1 }} />
                 <Box sx={{ width: 4, height: 16, backgroundColor: 'text.primary', borderRadius: 1 }} />
@@ -295,7 +383,23 @@ export default function Deployments() {
       </Grid>
 
       {/* Row 2: Active Rollout Stepper Card */}
-      <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2.5 }}>
+      <Card
+        sx={{
+          backgroundColor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: '16px',
+          p: 2.5,
+          transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: theme.palette.mode === 'dark' 
+              ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+              : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+            borderColor: 'primary.main',
+          }
+        }}
+      >
         
         {/* Header line of Card */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
@@ -450,7 +554,26 @@ export default function Deployments() {
       <Grid container spacing={2}>
         {deployments.map((dep) => (
           <Grid key={dep.name} size={{ xs: 12, md: 4 }}>
-            <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Card
+              sx={{
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '16px',
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                    : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                  borderColor: 'primary.main',
+                }
+              }}
+            >
               
               {/* Card Header section */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

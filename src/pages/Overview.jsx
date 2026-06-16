@@ -434,7 +434,23 @@ export default function Overview() {
         <Grid container spacing={2}>
           {/* Workload 1: api-gateway */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2 }}>
+            <Card
+              sx={{
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '16px',
+                p: 2,
+                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                    : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                  borderColor: 'primary.main',
+                }
+              }}
+            >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
                   <Box
@@ -517,7 +533,23 @@ export default function Overview() {
 
           {/* Workload 2: redis-master */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2 }}>
+            <Card
+              sx={{
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '16px',
+                p: 2,
+                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 12px 20px -10px rgba(99, 102, 241, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                    : '0 12px 20px -10px rgba(99, 102, 241, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                  borderColor: '#6366f1',
+                }
+              }}
+            >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
                   <Box
@@ -601,7 +633,23 @@ export default function Overview() {
 
           {/* Workload 3: worker-node-03 */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2 }}>
+            <Card
+              sx={{
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '16px',
+                p: 2,
+                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: theme.palette.mode === 'dark' 
+                    ? '0 12px 20px -10px rgba(245, 158, 11, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                    : '0 12px 20px -10px rgba(245, 158, 11, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                  borderColor: '#f59e0b',
+                }
+              }}
+            >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
                   <Box
@@ -682,6 +730,137 @@ export default function Overview() {
               </Box>
             </Card>
           </Grid>
+        </Grid>
+      </Box>
+
+      {/* Grid Row 4: Cluster Node Heatmap Grid */}
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1.0rem', mb: 2 }}>
+          Cluster Nodes Capacity & Allocations
+        </Typography>
+        <Grid container spacing={2}>
+          {[
+            {
+              name: 'node-master-01',
+              role: 'Master',
+              ip: '192.168.1.100',
+              cpu: 45,
+              mem: 60,
+              slots: [1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0] // 1: running, 2: warning, 3: failed, 0: empty
+            },
+            {
+              name: 'node-worker-01',
+              role: 'Worker',
+              ip: '192.168.1.101',
+              cpu: 78,
+              mem: 82,
+              slots: [1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 0, 0]
+            },
+            {
+              name: 'node-worker-02',
+              role: 'Worker',
+              ip: '192.168.1.102',
+              cpu: 28,
+              mem: 40,
+              slots: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+            }
+          ].map((node) => (
+            <Grid key={node.name} size={{ xs: 12, md: 4 }}>
+              <Card
+                sx={{
+                  backgroundColor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: '16px',
+                  p: 2,
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: theme.palette.mode === 'dark' 
+                      ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                      : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                    borderColor: 'primary.main',
+                  }
+                }}
+              >
+                {/* Node Header */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.825rem' }}>
+                      {node.name}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
+                      {`${node.role} • ${node.ip}`}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={`${node.cpu}% CPU`}
+                    size="small"
+                    sx={{
+                      backgroundColor: node.cpu > 70 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.08)',
+                      color: node.cpu > 70 ? 'error.main' : 'primary.main',
+                      fontSize: '0.625rem',
+                      fontWeight: 800,
+                      height: '18px',
+                    }}
+                  />
+                </Box>
+
+                {/* Progress bars for CPU/Mem */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 700 }}>Memory allocation</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.primary', fontSize: '0.65rem', fontWeight: 700 }}>{node.mem}%</Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={node.mem}
+                    sx={{
+                      height: 4,
+                      borderRadius: 2,
+                      backgroundColor: 'action.selected',
+                      '& .MuiLinearProgress-bar': { backgroundColor: node.mem > 80 ? '#ef4444' : '#10b981', borderRadius: 2 },
+                    }}
+                  />
+                </Box>
+
+                {/* Grid Slots Title */}
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.625rem', display: 'block', mb: 1, letterSpacing: '0.5px' }}>
+                  POD ALLOCATIONS ({node.slots.filter(s => s !== 0).length} / {node.slots.length} SLOTS)
+                </Typography>
+
+                {/* Grid slots display */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0.75 }}>
+                  {node.slots.map((slot, i) => {
+                    let bg = 'divider';
+                    let hoverText = 'Empty Slot';
+                    if (slot === 1) { bg = '#10b981'; hoverText = 'Running Pod'; }
+                    else if (slot === 2) { bg = '#f59e0b'; hoverText = 'Warning Pod'; }
+                    else if (slot === 3) { bg = '#ef4444'; hoverText = 'Failed Pod'; }
+                    
+                    return (
+                      <Box
+                        key={i}
+                        title={hoverText}
+                        sx={{
+                          height: 14,
+                          borderRadius: '3px',
+                          backgroundColor: bg === 'divider' ? 'action.selected' : bg,
+                          opacity: bg === 'divider' ? 0.4 : 0.85,
+                          transition: 'transform 0.2s ease, opacity 0.2s ease',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            transform: 'scale(1.15)',
+                            opacity: 1,
+                          }
+                        }}
+                      />
+                    );
+                  })}
+                </Box>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
       </Box>
     </Box>

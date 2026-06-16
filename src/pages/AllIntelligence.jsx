@@ -648,7 +648,28 @@ export default function AllIntelligence() {
         
         {/* Left tall card */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', height: '100%', minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2.5 }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              height: '100%',
+              minHeight: '300px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              p: 2.5,
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              }
+            }}
+          >
             {/* Header part */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
               <Box
@@ -788,7 +809,28 @@ export default function AllIntelligence() {
 
         {/* Right neural sphere card */}
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', height: '100%', minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2 }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              height: '100%',
+              minHeight: '300px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              p: 2,
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(6, 182, 212, 0.18), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(6, 182, 212, 0.12), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#06b6d4',
+              }
+            }}
+          >
             {/* Sphere graphic space */}
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
               <NeuralSphere />
@@ -819,7 +861,27 @@ export default function AllIntelligence() {
         
         {/* Card 1: Anomaly Detection */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2.25, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '260px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2.25,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '260px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              }
+            }}
+          >
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 1.75 }}>
                 <Box sx={{ p: 0.75, borderRadius: '8px', backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.12)', display: 'flex' }}>
@@ -877,7 +939,27 @@ export default function AllIntelligence() {
 
         {/* Card 2: Resource Waste */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2.25, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '260px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2.25,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '260px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(16, 185, 129, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(16, 185, 129, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#10b981',
+              }
+            }}
+          >
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 1.75 }}>
                 <Box sx={{ p: 0.75, borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.12)', display: 'flex' }}>
@@ -931,7 +1013,27 @@ export default function AllIntelligence() {
 
         {/* Card 3: Risk Prediction */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', p: 2.25, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '260px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              p: 2.25,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '260px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(139, 92, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(139, 92, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#8b5cf6',
+              }
+            }}
+          >
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 1.75 }}>
                 <Box sx={{ p: 0.75, borderRadius: '8px', backgroundColor: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.12)', display: 'flex' }}>
@@ -990,7 +1092,22 @@ export default function AllIntelligence() {
       </Grid>
 
       {/* Row 3: Intelligence Event Log */}
-      <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+      <Card
+        sx={{
+          backgroundColor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: '16px',
+          transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: theme.palette.mode === 'dark' 
+              ? '0 12px 20px -10px rgba(100, 116, 139, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+              : '0 12px 20px -10px rgba(100, 116, 139, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+            borderColor: 'text.secondary',
+          }
+        }}
+      >
         <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
