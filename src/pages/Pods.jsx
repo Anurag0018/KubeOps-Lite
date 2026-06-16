@@ -33,19 +33,12 @@ import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import OfflineBoltRoundedIcon from '@mui/icons-material/OfflineBoltRounded';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
-// Mock Pods Data from Target Mockup
-const initialPods = [
-  { name: 'api-gateway-7f8d5c9b', namespace: 'production', status: 'RUNNING', cpu: '124m', cpuPercent: 42, memory: '256 Mi', restarts: 0, age: '16m' },
-  { name: 'auth-service-v2-k9s1', namespace: 'production', status: 'RUNNING', cpu: '82m', cpuPercent: 28, memory: '128 Mi', restarts: 2, age: '4h' },
-  { name: 'worker-node-03-err', namespace: 'background-jobs', status: 'FAILED', cpu: '--', cpuPercent: 0, memory: '--', restarts: 14, age: '2d' },
-  { name: 'payment-processor-temp', namespace: 'staging', status: 'PENDING', cpu: '--', cpuPercent: 0, memory: '--', restarts: 0, age: '3d' },
-  { name: 'redis-master-0', namespace: 'data-tier', status: 'RUNNING', cpu: '45m', cpuPercent: 15, memory: '512 Mi', restarts: 0, age: '3d' },
-];
+import { useClusterStore, clusterStore } from '../store/clusterStore';
 
 export default function Pods() {
   const theme = useTheme();
-  const [pods, setPods] = useState(initialPods);
+  const [storeState] = useClusterStore();
+  const pods = storeState.pods;
   const [search, setSearch] = useState('');
   const [namespaceFilter, setNamespaceFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -64,13 +57,41 @@ export default function Pods() {
 
   const handleDeletePod = () => {
     if (selectedPod) {
-      setPods(pods.filter(p => p.name !== selectedPod.name));
+      clusterStore.deletePod(selectedPod.name);
     }
     handleMenuClose();
   };
 
   const handleRefresh = () => {
-    setPods(initialPods);
+    clusterStore.setState({
+      pods: [
+        { name: 'api-gateway-7f8d5c9b-1', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '124m', cpuPercent: 42, memory: '256 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-2', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '115m', cpuPercent: 38, memory: '240 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-3', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '130m', cpuPercent: 44, memory: '260 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-4', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '120m', cpuPercent: 40, memory: '250 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-5', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '122m', cpuPercent: 41, memory: '254 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-6', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '118m', cpuPercent: 39, memory: '248 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-7', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '126m', cpuPercent: 43, memory: '258 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'api-gateway-7f8d5c9b-8', deployment: 'api-gateway', namespace: 'production', status: 'RUNNING', cpu: '125m', cpuPercent: 42, memory: '256 Mi', restarts: 0, age: '16m', node: 'node-master-01' },
+        { name: 'auth-service-v2-k9s1', deployment: 'auth-service', namespace: 'production', status: 'RUNNING', cpu: '82m', cpuPercent: 28, memory: '128 Mi', restarts: 2, age: '4h', node: 'node-worker-01' },
+        { name: 'auth-service-v2-k9s2', deployment: 'auth-service', namespace: 'production', status: 'RUNNING', cpu: '80m', cpuPercent: 27, memory: '120 Mi', restarts: 1, age: '4h', node: 'node-worker-01' },
+        { name: 'auth-service-v2-k9s3', deployment: 'auth-service', namespace: 'production', status: 'RUNNING', cpu: '85m', cpuPercent: 29, memory: '130 Mi', restarts: 3, age: '4h', node: 'node-worker-01' },
+        { name: 'auth-service-v2-k9s4', deployment: 'auth-service', namespace: 'production', status: 'PENDING', cpu: '--', cpuPercent: 0, memory: '--', restarts: 0, age: '2m', node: 'node-worker-01' },
+        { name: 'worker-node-03-err', deployment: 'worker-jobs', namespace: 'background-jobs', status: 'FAILED', cpu: '--', cpuPercent: 0, memory: '--', restarts: 14, age: '2d', node: 'node-worker-01' },
+        { name: 'payment-db-sync-1', deployment: 'payment-db-sync', namespace: 'infrastructure', status: 'RUNNING', cpu: '40m', cpuPercent: 12, memory: '100 Mi', restarts: 0, age: '3d', node: 'node-worker-02' },
+        { name: 'payment-db-sync-2', deployment: 'payment-db-sync', namespace: 'infrastructure', status: 'RUNNING', cpu: '42m', cpuPercent: 14, memory: '110 Mi', restarts: 0, age: '3d', node: 'node-worker-02' },
+      ],
+      deployments: [
+        { name: 'api-gateway', ns: 'production', strategy: 'RollingUpdate', replicasReady: 8, replicasTotal: 8, status: 'Ready', cpu: '2.4 vCPU', memory: '4.8 GB RAM', iconBg: 'rgba(59, 130, 246, 0.08)', iconBorder: 'rgba(59, 130, 246, 0.12)', progressColor: '#3b82f6' },
+        { name: 'auth-service', ns: 'production', strategy: 'Recreate', replicasReady: 3, replicasTotal: 4, status: 'Ready', cpu: '1.2 vCPU', memory: '2.1 GB RAM', iconBg: 'rgba(163, 116, 255, 0.08)', iconBorder: 'rgba(163, 116, 255, 0.12)', progressColor: '#a374ff' },
+        { name: 'payment-db-sync', ns: 'infrastructure', strategy: 'RollingUpdate', replicasReady: 2, replicasTotal: 2, status: 'Ready', cpu: '0.8 vCPU', memory: '1.5 GB RAM', iconBg: 'rgba(16, 185, 129, 0.08)', iconBorder: 'rgba(16, 185, 129, 0.12)', progressColor: '#10b981' },
+      ],
+      healthScore: 94,
+      nodeOutage: false,
+      trafficSpike: false,
+      uptime: '99.98%',
+      latency: '12ms',
+    });
   };
 
   const filteredPods = pods.filter(pod => {

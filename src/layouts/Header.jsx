@@ -9,18 +9,33 @@ import {
   FormControl,
   Avatar,
   useTheme,
+  Tooltip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded';
 import CircleIcon from '@mui/icons-material/Circle';
+import OfflineBoltRoundedIcon from '@mui/icons-material/OfflineBoltRounded';
+import { useClusterStore } from '../store/clusterStore';
 
 export default function Header() {
   const [cluster, setCluster] = React.useState('production-us-east-1');
+  const [storeState, setStoreState] = useClusterStore();
   const theme = useTheme();
 
   const handleClusterChange = (event) => {
     setCluster(event.target.value);
   };
+
+  const handleToggleSimulator = () => {
+    setStoreState({ simulatorOpen: !storeState.simulatorOpen });
+  };
+
+  const accents = [
+    { name: 'blue', color: '#3b82f6' },
+    { name: 'purple', color: '#8b5cf6' },
+    { name: 'emerald', color: '#10b981' },
+    { name: 'orange', color: '#f97316' },
+  ];
 
   return (
     <Box
@@ -39,6 +54,14 @@ export default function Header() {
         transition: 'background-color 0.3s ease, border-color 0.3s ease',
       }}
     >
+      <style>{`
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+          70% { box-shadow: 0 0 0 6px rgba(99, 102, 241, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+      `}</style>
+
       {/* Search Bar */}
       <Box
         sx={{
@@ -54,7 +77,7 @@ export default function Header() {
           transition: 'all 0.3s ease',
           '&:focus-within': {
             borderColor: 'primary.main',
-            boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.3)',
+            boxShadow: `0 0 0 1px ${theme.palette.primary.main}4d`,
           },
         }}
       >
@@ -75,6 +98,58 @@ export default function Header() {
 
       {/* Right Actions */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        
+        {/* Theme Accent Color Picker */}
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '20px', px: 1.5, py: 0.5 }}>
+          {accents.map((accent) => {
+            const isSelected = storeState.accentColor === accent.name;
+            return (
+              <Tooltip key={accent.name} title={`Select ${accent.name} theme`} arrow>
+                <IconButton
+                  size="small"
+                  onClick={() => setStoreState({ accentColor: accent.name })}
+                  sx={{
+                    width: 16,
+                    height: 16,
+                    backgroundColor: accent.color,
+                    border: isSelected ? '1.5px solid #ffffff' : '1px solid rgba(0,0,0,0.1)',
+                    boxShadow: isSelected ? '0 0 4px rgba(0,0,0,0.5)' : 'none',
+                    p: 0,
+                    '&:hover': {
+                      backgroundColor: accent.color,
+                      transform: 'scale(1.2)',
+                    },
+                    transition: 'transform 0.2s ease',
+                  }}
+                />
+              </Tooltip>
+            );
+          })}
+        </Box>
+
+        {/* Pulse Animated Cluster Simulator Toggle Button */}
+        <Tooltip title="Toggle Cluster Simulator Drawer" arrow>
+          <IconButton
+            onClick={handleToggleSimulator}
+            sx={{
+              color: storeState.simulatorOpen ? '#ffffff' : 'primary.main',
+              backgroundColor: storeState.simulatorOpen ? 'primary.main' : 'background.paper',
+              border: '1px solid',
+              borderColor: 'primary.main',
+              borderRadius: '50%',
+              p: 1,
+              animation: storeState.simulatorOpen ? 'none' : 'pulseGlow 2s infinite',
+              '&:hover': {
+                backgroundColor: 'primary.main',
+                color: '#ffffff',
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <OfflineBoltRoundedIcon sx={{ fontSize: 20 }} />
+          </IconButton>
+        </Tooltip>
+
         {/* Cluster Selector */}
         <FormControl size="small">
           <Select

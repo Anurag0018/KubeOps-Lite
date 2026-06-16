@@ -27,6 +27,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SecurityIcon from '@mui/icons-material/Security';
 import SyncIcon from '@mui/icons-material/Sync';
+import { useClusterStore } from '../store/clusterStore';
 
 // Mock trend metrics for CPU, Memory, and Network health timeline
 const timelineData = [
@@ -46,6 +47,14 @@ const timelineData = [
 
 export default function Overview() {
   const theme = useTheme();
+  const [storeState] = useClusterStore();
+
+  const totalPods = storeState.pods.length;
+  const healthyPods = storeState.pods.filter(p => p.status === 'RUNNING').length;
+  const warningPods = storeState.pods.filter(p => p.status === 'PENDING').length;
+  const failedPods = storeState.pods.filter(p => p.status === 'FAILED').length;
+  const totalWarnings = warningPods + failedPods;
+  const totalDeployments = storeState.deployments.length;
 
   return (
     <Box sx={{ p: 3, backgroundColor: 'transparent', width: '100%' }}>
@@ -98,7 +107,7 @@ export default function Overview() {
                 </Box>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', mb: 0.25 }}>Total Pods</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.8rem' }}>124</Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.8rem' }}>{totalPods}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -134,7 +143,7 @@ export default function Overview() {
                 </Box>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', mb: 0.25 }}>Healthy Pods</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: theme.palette.mode === 'dark' ? '#10b981' : '#059669', fontSize: '1.8rem' }}>117</Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: theme.palette.mode === 'dark' ? '#10b981' : '#059669', fontSize: '1.8rem' }}>{healthyPods}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -185,7 +194,7 @@ export default function Overview() {
                 </Box>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', mb: 0.25 }}>Warnings</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.8rem' }}>5</Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.8rem' }}>{totalWarnings}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -219,7 +228,7 @@ export default function Overview() {
                 </Box>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', mb: 0.25 }}>Deployments</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.8rem' }}>18</Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.8rem' }}>{totalDeployments}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -265,7 +274,7 @@ export default function Overview() {
               {/* Line Chart */}
               <Box sx={{ flex: 1, width: '100%', minHeight: 0 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={timelineData} margin={{ top: 10, right: 10, left: -45, bottom: 12 }}>
+                  <LineChart data={storeState.timelineData} margin={{ top: 10, right: 10, left: -45, bottom: 12 }}>
                     <XAxis dataKey="time" stroke={theme.palette.text.secondary} fontSize={10} tickLine={false} axisLine={false} dy={8} style={{ fontWeight: 600 }} />
                     <Tooltip
                       contentStyle={{
@@ -315,7 +324,7 @@ export default function Overview() {
                 <style>{`
                   @keyframes drawProgressRing {
                     from { stroke-dashoffset: ${2 * Math.PI * 80}; }
-                    to { stroke-dashoffset: ${2 * Math.PI * 80 * (1 - 0.94)}; }
+                    to { stroke-dashoffset: ${2 * Math.PI * 80 * (1 - storeState.healthScore / 100)}; }
                   }
                 `}</style>
                 <svg width="130" height="130" viewBox="0 0 200 200">
@@ -325,10 +334,10 @@ export default function Overview() {
                     cy="100"
                     r="80"
                     fill="none"
-                    stroke="#3b82f6"
+                    stroke={storeState.healthScore >= 90 ? '#10b981' : (storeState.healthScore >= 75 ? '#f59e0b' : '#ef4444')}
                     strokeWidth="12"
                     strokeDasharray={2 * Math.PI * 80}
-                    strokeDashoffset={2 * Math.PI * 80 * (1 - 0.94)}
+                    strokeDashoffset={2 * Math.PI * 80 * (1 - storeState.healthScore / 100)}
                     strokeLinecap="round"
                     transform="rotate(-90 100 100)"
                     style={{
@@ -338,10 +347,19 @@ export default function Overview() {
                 </svg>
                 <Box sx={{ position: 'absolute', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <Typography variant="h2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '2.1rem', lineHeight: 1.1 }}>
-                    94%
+                    {storeState.healthScore}%
                   </Typography>
-                  <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 800, fontSize: '0.65rem', letterSpacing: '1px', mt: 0.25 }}>
-                    EXCELLENT
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: storeState.healthScore >= 90 ? '#10b981' : (storeState.healthScore >= 75 ? '#f59e0b' : '#ef4444'),
+                      fontWeight: 800,
+                      fontSize: '0.65rem',
+                      letterSpacing: '1px',
+                      mt: 0.25
+                    }}
+                  >
+                    {storeState.healthScore >= 90 ? 'EXCELLENT' : (storeState.healthScore >= 75 ? 'GOOD' : 'WARNING')}
                   </Typography>
                 </Box>
               </Box>
@@ -357,7 +375,7 @@ export default function Overview() {
                     textAlign: 'center'
                   }}>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, display: 'block', mb: 0.25, fontSize: '0.625rem', letterSpacing: '0.5px' }}>UPTIME</Typography>
-                    <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.85rem' }}>99.98%</Typography>
+                    <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.85rem' }}>{storeState.uptime}</Typography>
                   </Box>
                 </Grid>
                 <Grid size={{ xs: 6 }}>
@@ -370,7 +388,7 @@ export default function Overview() {
                     textAlign: 'center'
                   }}>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, display: 'block', mb: 0.25, fontSize: '0.625rem', letterSpacing: '0.5px' }}>LATENCY</Typography>
-                    <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.85rem' }}>12ms</Typography>
+                    <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.85rem' }}>{storeState.latency}</Typography>
                   </Box>
                 </Grid>
               </Grid>
@@ -432,304 +450,162 @@ export default function Overview() {
           </Box>
         </Box>
         <Grid container spacing={2}>
-          {/* Workload 1: api-gateway */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card
-              sx={{
-                backgroundColor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: '16px',
-                p: 2,
-                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: theme.palette.mode === 'dark' 
-                    ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-                    : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
-                  borderColor: 'primary.main',
-                }
-              }}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                      border: '1px solid rgba(59, 130, 246, 0.12)',
-                      color: '#3b82f6',
-                      display: 'flex',
-                    }}
-                  >
-                    <LayersIcon sx={{ fontSize: 16 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.85rem', lineHeight: 1.2 }}>
-                      api-gateway
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                      <svg width="8" height="8" viewBox="0 0 100 100" style={{ fill: theme.palette.text.secondary }}>
-                        <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" />
-                      </svg>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
-                        production
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-                <Chip
-                  label="RUNNING"
-                  size="small"
-                  sx={{
-                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.08)' : 'rgba(4, 120, 87, 0.08)',
-                    color: theme.palette.mode === 'dark' ? '#10b981' : '#047857',
-                    fontSize: '0.6rem',
-                    fontWeight: 800,
-                    height: '18px',
-                    borderRadius: '6px',
-                    border: '1px solid',
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(4, 120, 87, 0.15)',
-                  }}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>CPU Usage</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>42%</Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={42}
-                    sx={{
-                      height: 4,
-                      borderRadius: 3,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: '#3b82f6', borderRadius: 3 },
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>Memory</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>1.2 GB</Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={30}
-                    sx={{
-                      height: 4,
-                      borderRadius: 3,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: '#10b981', borderRadius: 3 },
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Card>
-          </Grid>
+          {storeState.deployments.map((dep) => {
+            const depPods = storeState.pods.filter((p) => p.deployment === dep.name);
+            const runningPods = depPods.filter((p) => p.status === 'RUNNING');
+            
+            // calculate average CPU percent
+            let avgCpu = 0;
+            if (runningPods.length > 0) {
+              const totalCpu = runningPods.reduce((acc, p) => acc + (p.cpuPercent || 0), 0);
+              avgCpu = Math.round(totalCpu / runningPods.length);
+            }
+            
+            // calculate memory
+            let memStr = '0 Mi';
+            let memPercent = 0;
+            if (runningPods.length > 0) {
+              const memVal = runningPods.reduce((acc, p) => acc + (parseFloat(p.memory) || 0), 0);
+              memPercent = Math.min(100, Math.round(memVal / 12)); // mock scale
+              memStr = memVal >= 1024 ? `${(memVal / 1024).toFixed(1)} GB` : `${memVal} Mi`;
+            }
 
-          {/* Workload 2: redis-master */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card
-              sx={{
-                backgroundColor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: '16px',
-                p: 2,
-                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: theme.palette.mode === 'dark' 
-                    ? '0 12px 20px -10px rgba(99, 102, 241, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-                    : '0 12px 20px -10px rgba(99, 102, 241, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
-                  borderColor: '#6366f1',
-                }
-              }}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderRadius: '8px',
-                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(163, 116, 255, 0.08)' : 'rgba(99, 102, 241, 0.08)',
-                      border: '1px solid',
-                      borderColor: theme.palette.mode === 'dark' ? 'rgba(163, 116, 255, 0.12)' : 'rgba(99, 102, 241, 0.15)',
-                      color: theme.palette.mode === 'dark' ? '#a374ff' : '#6366f1',
-                      display: 'flex',
-                    }}
-                  >
-                    <StorageRoundedIcon sx={{ fontSize: 16 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.85rem', lineHeight: 1.2 }}>
-                      redis-master
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                      <svg width="8" height="8" viewBox="0 0 100 100" style={{ fill: theme.palette.text.secondary }}>
-                        <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" />
-                      </svg>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
-                        data-tier
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-                <Chip
-                  label="RUNNING"
-                  size="small"
-                  sx={{
-                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.08)' : 'rgba(4, 120, 87, 0.08)',
-                    color: theme.palette.mode === 'dark' ? '#10b981' : '#047857',
-                    fontSize: '0.6rem',
-                    fontWeight: 800,
-                    height: '18px',
-                    borderRadius: '6px',
-                    border: '1px solid',
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(4, 120, 87, 0.15)',
-                  }}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>CPU Usage</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>18%</Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={18}
-                    sx={{
-                      height: 4,
-                      borderRadius: 3,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: '#3b82f6', borderRadius: 3 },
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>Memory</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>4.8 GB</Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={60}
-                    sx={{
-                      height: 4,
-                      borderRadius: 3,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: '#10b981', borderRadius: 3 },
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Card>
-          </Grid>
+            // status text
+            const hasFailed = depPods.some((p) => p.status === 'FAILED');
+            const hasPending = depPods.some((p) => p.status === 'PENDING');
+            const statusText = hasFailed ? 'WARNING' : (hasPending ? 'WARNING' : 'RUNNING'); // Staging pending -> WARNING alert level
 
-          {/* Workload 3: worker-node-03 */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card
-              sx={{
-                backgroundColor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: '16px',
-                p: 2,
-                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: theme.palette.mode === 'dark' 
-                    ? '0 12px 20px -10px rgba(245, 158, 11, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-                    : '0 12px 20px -10px rgba(245, 158, 11, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
-                  borderColor: '#f59e0b',
-                }
-              }}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderRadius: '8px',
-                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(180, 83, 9, 0.08)',
-                      border: '1px solid',
-                      borderColor: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(180, 83, 9, 0.15)',
-                      color: theme.palette.mode === 'dark' ? '#f59e0b' : '#b45309',
-                      display: 'flex',
-                    }}
-                  >
-                    <TerminalRoundedIcon sx={{ fontSize: 16 }} />
+            const statusColors = {
+              RUNNING: {
+                bg: theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.08)' : 'rgba(4, 120, 87, 0.08)',
+                color: theme.palette.mode === 'dark' ? '#10b981' : '#047857',
+                borderColor: theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(4, 120, 87, 0.15)'
+              },
+              WARNING: {
+                bg: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(180, 83, 9, 0.08)',
+                color: theme.palette.mode === 'dark' ? '#f59e0b' : '#b45309',
+                borderColor: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(180, 83, 9, 0.15)'
+              }
+            };
+            const currentStatusColor = statusColors[statusText] || statusColors.RUNNING;
+
+            let icon = <LayersIcon sx={{ fontSize: 16 }} />;
+            let iconColor = '#3b82f6';
+            let iconBg = 'rgba(59, 130, 246, 0.08)';
+            let iconBorder = 'rgba(59, 130, 246, 0.12)';
+
+            if (dep.name.includes('db') || dep.name.includes('redis') || dep.name.includes('sync')) {
+              icon = <StorageRoundedIcon sx={{ fontSize: 16 }} />;
+              iconColor = '#10b981';
+              iconBg = 'rgba(16, 185, 129, 0.08)';
+              iconBorder = 'rgba(16, 185, 129, 0.12)';
+            } else if (dep.name.includes('auth')) {
+              icon = <TerminalRoundedIcon sx={{ fontSize: 16 }} />;
+              iconColor = '#a374ff';
+              iconBg = 'rgba(163, 116, 255, 0.08)';
+              iconBorder = 'rgba(163, 116, 255, 0.12)';
+            }
+
+            return (
+              <Grid key={dep.name} size={{ xs: 12, md: 4 }}>
+                <Card
+                  sx={{
+                    backgroundColor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: '16px',
+                    p: 2,
+                    transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.palette.mode === 'dark' 
+                        ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                        : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                      borderColor: 'primary.main',
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          p: 1,
+                          borderRadius: '8px',
+                          backgroundColor: iconBg,
+                          border: `1px solid ${iconBorder}`,
+                          color: iconColor,
+                          display: 'flex',
+                        }}
+                      >
+                        {icon}
+                      </Box>
+                      <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.85rem', lineHeight: 1.2 }}>
+                          {dep.name}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                          <svg width="8" height="8" viewBox="0 0 100 100" style={{ fill: theme.palette.text.secondary }}>
+                            <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" />
+                          </svg>
+                          <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
+                            {dep.ns}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Chip
+                      label={statusText}
+                      size="small"
+                      sx={{
+                        backgroundColor: currentStatusColor.bg,
+                        color: currentStatusColor.color,
+                        fontSize: '0.6rem',
+                        fontWeight: 800,
+                        height: '18px',
+                        borderRadius: '6px',
+                        border: '1px solid',
+                        borderColor: currentStatusColor.borderColor,
+                      }}
+                    />
                   </Box>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.85rem', lineHeight: 1.2 }}>
-                      worker-node-03
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                      <svg width="8" height="8" viewBox="0 0 100 100" style={{ fill: theme.palette.text.secondary }}>
-                        <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" />
-                      </svg>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
-                        background-jobs
-                      </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    <Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>CPU Usage</Typography>
+                        <Typography variant="body2" sx={{ color: statusText === 'WARNING' ? 'error.main' : 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>{statusText === 'WARNING' ? '92%' : `${avgCpu}%`}</Typography>
+                      </Box>
+                      <LinearProgress
+                        variant="determinate"
+                        value={statusText === 'WARNING' ? 92 : avgCpu}
+                        sx={{
+                          height: 4,
+                          borderRadius: 3,
+                          backgroundColor: 'action.selected',
+                          '& .MuiLinearProgress-bar': { backgroundColor: statusText === 'WARNING' ? '#ef4444' : 'primary.main', borderRadius: 3 },
+                        }}
+                      />
+                    </Box>
+                    <Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>Memory</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>{statusText === 'WARNING' ? '2.1 GB' : memStr}</Typography>
+                      </Box>
+                      <LinearProgress
+                        variant="determinate"
+                        value={statusText === 'WARNING' ? 40 : memPercent}
+                        sx={{
+                          height: 4,
+                          borderRadius: 3,
+                          backgroundColor: 'action.selected',
+                          '& .MuiLinearProgress-bar': { backgroundColor: '#10b981', borderRadius: 3 },
+                        }}
+                      />
                     </Box>
                   </Box>
-                </Box>
-                <Chip
-                  label="WARNING"
-                  size="small"
-                  sx={{
-                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(180, 83, 9, 0.08)',
-                    color: theme.palette.mode === 'dark' ? '#f59e0b' : '#b45309',
-                    fontSize: '0.6rem',
-                    fontWeight: 800,
-                    height: '18px',
-                    borderRadius: '6px',
-                    border: '1px solid',
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(180, 83, 9, 0.15)',
-                  }}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>CPU Usage</Typography>
-                    <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 700, fontSize: '0.7rem' }}>92%</Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={92}
-                    sx={{
-                      height: 4,
-                      borderRadius: 3,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: '#ef4444', borderRadius: 3 },
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>Memory</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.7rem' }}>2.1 GB</Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={40}
-                    sx={{
-                      height: 4,
-                      borderRadius: 3,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: '#10b981', borderRadius: 3 },
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Card>
-          </Grid>
+                </Card>
+              </Grid>
+            );
+          })}
         </Grid>
       </Box>
 
@@ -739,128 +615,132 @@ export default function Overview() {
           Cluster Nodes Capacity & Allocations
         </Typography>
         <Grid container spacing={2}>
-          {[
-            {
-              name: 'node-master-01',
-              role: 'Master',
-              ip: '192.168.1.100',
-              cpu: 45,
-              mem: 60,
-              slots: [1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0] // 1: running, 2: warning, 3: failed, 0: empty
-            },
-            {
-              name: 'node-worker-01',
-              role: 'Worker',
-              ip: '192.168.1.101',
-              cpu: 78,
-              mem: 82,
-              slots: [1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 0, 0]
-            },
-            {
-              name: 'node-worker-02',
-              role: 'Worker',
-              ip: '192.168.1.102',
-              cpu: 28,
-              mem: 40,
-              slots: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+          {storeState.nodes.map((node) => {
+            // Compute slots dynamically based on pods assigned to this node
+            const nodePods = storeState.pods.filter(p => p.node === node.name);
+            
+            // Construct slots array of size 12: 1 for RUNNING, 2 for PENDING, 3 for FAILED, 0 for empty
+            const slots = Array(12).fill(0);
+            if (node.status === 'Online') {
+              nodePods.forEach((pod, index) => {
+                if (index < 12) {
+                  if (pod.status === 'RUNNING') slots[index] = 1;
+                  else if (pod.status === 'PENDING') slots[index] = 2;
+                  else if (pod.status === 'FAILED') slots[index] = 3;
+                }
+              });
             }
-          ].map((node) => (
-            <Grid key={node.name} size={{ xs: 12, md: 4 }}>
-              <Card
-                sx={{
-                  backgroundColor: 'background.paper',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: '16px',
-                  p: 2,
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: theme.palette.mode === 'dark' 
-                      ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
-                      : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
-                    borderColor: 'primary.main',
-                  }
-                }}
-              >
-                {/* Node Header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.825rem' }}>
-                      {node.name}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
-                      {`${node.role} • ${node.ip}`}
-                    </Typography>
+
+            const activeSlotsCount = slots.filter(s => s !== 0).length;
+
+            // Calculate node stats based on pod load
+            let currentCpu = node.cpu;
+            let currentMem = node.mem;
+            if (node.status === 'Online') {
+              // Adjust slightly based on total active slots to show dynamic cpu load
+              const loadFactor = activeSlotsCount / 12;
+              currentCpu = Math.min(99, Math.round((node.cpu * 0.4) + (loadFactor * 60)));
+              currentMem = Math.min(99, Math.round((node.mem * 0.5) + (loadFactor * 50)));
+            }
+
+            return (
+              <Grid key={node.name} size={{ xs: 12, md: 4 }}>
+                <Card
+                  sx={{
+                    backgroundColor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: '16px',
+                    p: 2,
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: theme.palette.mode === 'dark' 
+                        ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                        : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                      borderColor: 'primary.main',
+                    }
+                  }}
+                >
+                  {/* Node Header */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.825rem' }}>
+                        {node.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
+                        {`${node.role} • ${node.ip} • ${node.status}`}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={node.status === 'Offline' ? 'OFFLINE' : `${currentCpu}% CPU`}
+                      size="small"
+                      sx={{
+                        backgroundColor: node.status === 'Offline' ? 'rgba(239, 68, 68, 0.08)' : (currentCpu > 70 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.08)'),
+                        color: node.status === 'Offline' ? 'error.main' : (currentCpu > 70 ? 'error.main' : 'primary.main'),
+                        fontSize: '0.625rem',
+                        fontWeight: 800,
+                        height: '18px',
+                      }}
+                    />
                   </Box>
-                  <Chip
-                    label={`${node.cpu}% CPU`}
-                    size="small"
-                    sx={{
-                      backgroundColor: node.cpu > 70 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.08)',
-                      color: node.cpu > 70 ? 'error.main' : 'primary.main',
-                      fontSize: '0.625rem',
-                      fontWeight: 800,
-                      height: '18px',
-                    }}
-                  />
-                </Box>
 
-                {/* Progress bars for CPU/Mem */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 700 }}>Memory allocation</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.primary', fontSize: '0.65rem', fontWeight: 700 }}>{node.mem}%</Typography>
+                  {/* Progress bars for CPU/Mem */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 700 }}>Memory allocation</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.primary', fontSize: '0.65rem', fontWeight: 700 }}>{node.status === 'Offline' ? '0' : currentMem}%</Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={node.status === 'Offline' ? 0 : currentMem}
+                      sx={{
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: 'action.selected',
+                        '& .MuiLinearProgress-bar': { backgroundColor: currentMem > 80 ? '#ef4444' : '#10b981', borderRadius: 2 },
+                      }}
+                    />
                   </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={node.mem}
-                    sx={{
-                      height: 4,
-                      borderRadius: 2,
-                      backgroundColor: 'action.selected',
-                      '& .MuiLinearProgress-bar': { backgroundColor: node.mem > 80 ? '#ef4444' : '#10b981', borderRadius: 2 },
-                    }}
-                  />
-                </Box>
 
-                {/* Grid Slots Title */}
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.625rem', display: 'block', mb: 1, letterSpacing: '0.5px' }}>
-                  POD ALLOCATIONS ({node.slots.filter(s => s !== 0).length} / {node.slots.length} SLOTS)
-                </Typography>
+                  {/* Grid Slots Title */}
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.625rem', display: 'block', mb: 1, letterSpacing: '0.5px' }}>
+                    POD ALLOCATIONS ({node.status === 'Offline' ? 0 : activeSlotsCount} / 12 SLOTS)
+                  </Typography>
 
-                {/* Grid slots display */}
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0.75 }}>
-                  {node.slots.map((slot, i) => {
-                    let bg = 'divider';
-                    let hoverText = 'Empty Slot';
-                    if (slot === 1) { bg = '#10b981'; hoverText = 'Running Pod'; }
-                    else if (slot === 2) { bg = '#f59e0b'; hoverText = 'Warning Pod'; }
-                    else if (slot === 3) { bg = '#ef4444'; hoverText = 'Failed Pod'; }
-                    
-                    return (
-                      <Box
-                        key={i}
-                        title={hoverText}
-                        sx={{
-                          height: 14,
-                          borderRadius: '3px',
-                          backgroundColor: bg === 'divider' ? 'action.selected' : bg,
-                          opacity: bg === 'divider' ? 0.4 : 0.85,
-                          transition: 'transform 0.2s ease, opacity 0.2s ease',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            transform: 'scale(1.15)',
-                            opacity: 1,
-                          }
-                        }}
-                      />
-                    );
-                  })}
-                </Box>
-              </Card>
-            </Grid>
-          ))}
+                  {/* Grid slots display */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0.75 }}>
+                    {slots.map((slot, i) => {
+                      let bg = 'divider';
+                      let hoverText = 'Empty Slot';
+                      if (slot === 1) { bg = '#10b981'; hoverText = 'Running Pod'; }
+                      else if (slot === 2) { bg = '#f59e0b'; hoverText = 'Warning Pod'; }
+                      else if (slot === 3) { bg = '#ef4444'; hoverText = 'Failed Pod'; }
+                      
+                      return (
+                        <Box
+                          key={i}
+                          title={hoverText}
+                          sx={{
+                            height: 14,
+                            borderRadius: '3px',
+                            backgroundColor: bg === 'divider' ? 'action.selected' : bg,
+                            opacity: bg === 'divider' ? 0.4 : 0.85,
+                            transition: 'transform 0.2s ease, opacity 0.2s ease',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              transform: 'scale(1.15)',
+                              opacity: 1,
+                            }
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
+                </Card>
+              </Grid>
+            );
+          })}
         </Grid>
       </Box>
     </Box>

@@ -1,54 +1,10 @@
 import { createTheme } from '@mui/material/styles';
+import { getPalette } from './palette';
 
-export const getTheme = (mode) => {
+export const getTheme = (mode, accentColor) => {
   const isDark = mode === 'dark';
   return createTheme({
-    palette: {
-      mode,
-      primary: {
-        main: '#3b82f6', // Electric Blue
-        light: '#60a5fa',
-        dark: '#1d4ed8',
-        contrastText: '#ffffff',
-      },
-      secondary: {
-        main: '#6366f1', // Indigo
-        light: '#818cf8',
-        dark: '#4338ca',
-        contrastText: '#ffffff',
-      },
-      background: {
-        default: isDark ? '#080c15' : '#f8fafc', // Deep Obsidian vs Slate 50
-        paper: isDark ? '#0e1626' : '#ffffff',   // Card Surface vs Pure White
-        sidebar: isDark ? '#0a0e1a' : '#f1f5f9', // Darker vs Light grey sidebar
-      },
-      text: {
-        primary: isDark ? '#f8fafc' : '#0f172a', // Off-white vs Slate 900
-        secondary: isDark ? '#94a3b8' : '#475569', // Slate grey vs Slate 600
-        disabled: isDark ? '#64748b' : '#94a3b8',
-      },
-      success: {
-        main: '#10b981', // Emerald
-        light: '#34d399',
-        dark: '#047857',
-      },
-      warning: {
-        main: '#f59e0b', // Amber
-        light: '#fbbf24',
-        dark: '#b45309',
-      },
-      error: {
-        main: '#ef4444', // Red
-        light: '#f87171',
-        dark: '#b91c1c',
-      },
-      info: {
-        main: '#06b6d4', // Cyan
-        light: '#22d3ee',
-        dark: '#0e7490',
-      },
-      divider: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
-    },
+    palette: getPalette(mode, accentColor),
     typography: {
       fontFamily: [
         'Inter',

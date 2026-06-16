@@ -37,55 +37,12 @@ import HeightRoundedIcon from '@mui/icons-material/HeightRounded';
 import SyncRoundedIcon from '@mui/icons-material/SyncRounded';
 import SettingsBackupRestoreRoundedIcon from '@mui/icons-material/SettingsBackupRestoreRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-
-const initialDeploymentsList = [
-  {
-    name: 'api-gateway',
-    ns: 'production',
-    strategy: 'RollingUpdate',
-    replicasReady: 8,
-    replicasTotal: 8,
-    status: 'Ready',
-    cpu: '2.4 vCPU',
-    memory: '4.8 GB RAM',
-    icon: <AccountTreeRoundedIcon sx={{ color: '#3b82f6', fontSize: 18 }} />,
-    iconBg: 'rgba(59, 130, 246, 0.08)',
-    iconBorder: 'rgba(59, 130, 246, 0.12)',
-    progressColor: '#10b981',
-  },
-  {
-    name: 'auth-service',
-    ns: 'production',
-    strategy: 'Recreate',
-    replicasReady: 3,
-    replicasTotal: 4,
-    status: 'Updating',
-    cpu: '1.2 vCPU',
-    memory: '2.1 GB RAM',
-    icon: <LockRoundedIcon sx={{ color: '#a374ff', fontSize: 18 }} />,
-    iconBg: 'rgba(163, 116, 255, 0.08)',
-    iconBorder: 'rgba(163, 116, 255, 0.12)',
-    progressColor: '#3b82f6',
-  },
-  {
-    name: 'payment-db-sync',
-    ns: 'infrastructure',
-    strategy: 'RollingUpdate',
-    replicasReady: 2,
-    replicasTotal: 2,
-    status: 'Ready',
-    cpu: '0.8 vCPU',
-    memory: '1.5 GB RAM',
-    icon: <StorageRoundedIcon sx={{ color: '#10b981', fontSize: 18 }} />,
-    iconBg: 'rgba(16, 185, 129, 0.08)',
-    iconBorder: 'rgba(16, 185, 129, 0.12)',
-    progressColor: '#10b981',
-  },
-];
+import { useClusterStore, clusterStore } from '../store/clusterStore';
 
 export default function Deployments() {
   const theme = useTheme();
-  const [deployments, setDeployments] = useState(initialDeploymentsList);
+  const [storeState] = useClusterStore();
+  const deployments = storeState.deployments;
   const [searchQuery, setSearchQuery] = useState('');
   const [cluster, setCluster] = useState('production-us-east-1');
   const [sortBy, setSortBy] = useState('recent');
@@ -118,48 +75,14 @@ export default function Deployments() {
 
   const handleApplyScale = () => {
     if (scalingDep) {
-      setDeployments(deployments.map(d => {
-        if (d.name === scalingDep.name) {
-          const isFull = scaleValue === scalingDep.replicasReady; // Simplistic status check
-          return {
-            ...d,
-            replicasTotal: scaleValue,
-            status: scaleValue === d.replicasReady ? 'Ready' : 'Updating',
-            progressColor: scaleValue === d.replicasReady ? '#10b981' : '#3b82f6'
-          };
-        }
-        return d;
-      }));
+      clusterStore.scaleDeployment(scalingDep.name, scaleValue);
     }
     setScaleDialogOpen(false);
     setScalingDep(null);
   };
 
   const handleRestart = (dep) => {
-    // Show updating transition simulation
-    setDeployments(deployments.map(d => {
-      if (d.name === dep.name) {
-        return {
-          ...d,
-          status: 'Updating',
-          progressColor: '#3b82f6'
-        };
-      }
-      return d;
-    }));
-    
-    setTimeout(() => {
-      setDeployments(prev => prev.map(d => {
-        if (d.name === dep.name) {
-          return {
-            ...d,
-            status: 'Ready',
-            progressColor: '#10b981'
-          };
-        }
-        return d;
-      }));
-    }, 4000);
+    clusterStore.restartDeployment(dep.name);
     handleMenuClose();
   };
 

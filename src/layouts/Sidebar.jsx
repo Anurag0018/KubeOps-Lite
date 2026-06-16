@@ -22,6 +22,7 @@ import TerminalRoundedIcon from '@mui/icons-material/TerminalRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import OfflineBoltRoundedIcon from '@mui/icons-material/OfflineBoltRounded';
+import { useClusterStore } from '../store/clusterStore';
 
 const DRAWER_WIDTH = 240;
 
@@ -119,7 +120,9 @@ const KubeOpsLogo = ({ themeMode }) => (
   </Box>
 );
 
-export default function Sidebar({ currentView, onViewChange, themeMode, setThemeMode }) {
+export default function Sidebar({ currentView, onViewChange }) {
+  const [storeState, setStoreState] = useClusterStore();
+  const themeMode = storeState.themeMode;
   return (
     <Drawer
       variant="permanent"
@@ -242,7 +245,7 @@ export default function Sidebar({ currentView, onViewChange, themeMode, setTheme
           
           {/* Custom Toggle Switch Pill */}
           <Box
-            onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
+            onClick={() => setStoreState({ themeMode: themeMode === 'dark' ? 'light' : 'dark' })}
             sx={{
               width: 52,
               height: 26,

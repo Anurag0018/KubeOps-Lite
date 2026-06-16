@@ -152,6 +152,21 @@ export default function Logs() {
     log.toLowerCase().includes(logSearch.toLowerCase())
   );
 
+  const highlightText = (text, highlight) => {
+    if (!highlight || !highlight.trim()) return text;
+    const regex = new RegExp(`(${highlight.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <mark key={index} style={{ backgroundColor: '#f59e0b', color: '#000000', padding: '0 2px', borderRadius: '2px', fontWeight: 700 }}>
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
+
   // High-fidelity Log line parser
   const renderLogLine = (line, index) => {
     const isDark = theme.palette.mode === 'dark';
@@ -174,7 +189,7 @@ export default function Logs() {
     if (line.trim().startsWith('at ')) {
       return (
         <Box key={index} sx={{ color: colors.traceText, pl: 6, fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: 1.6 }}>
-          {line}
+          {highlightText(line, logSearch)}
         </Box>
       );
     }
@@ -183,7 +198,7 @@ export default function Logs() {
     if (!match) {
       return (
         <Box key={index} sx={{ color: colors.defaultText, fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: 1.6 }}>
-          {line}
+          {highlightText(line, logSearch)}
         </Box>
       );
     }
@@ -207,37 +222,37 @@ export default function Logs() {
         const matchedStr = matchArr[0];
 
         if (matchIndex > lastIndex) {
-          parts.push(msg.substring(lastIndex, matchIndex));
+          parts.push(highlightText(msg.substring(lastIndex, matchIndex), logSearch));
         }
 
         if (matchedStr.startsWith('GET') || matchedStr.startsWith('POST')) {
           parts.push(
             <span key={matchIndex} style={{ color: colors.method, fontWeight: 600 }}>
-              {matchedStr}
+              {highlightText(matchedStr, logSearch)}
             </span>
           );
         } else if (matchedStr.startsWith('user_')) {
           parts.push(
             <span key={matchIndex} style={{ color: colors.user, fontWeight: 700 }}>
-              {matchedStr}
+              {highlightText(matchedStr, logSearch)}
             </span>
           );
         } else if (matchedStr.startsWith('ORDER-')) {
           parts.push(
             <span key={matchIndex} style={{ color: colors.order, fontWeight: 700 }}>
-              {matchedStr}
+              {highlightText(matchedStr, logSearch)}
             </span>
           );
         } else if (matchedStr === 'ECONNRESET') {
           parts.push(
             <span key={matchIndex} style={{ color: colors.econn, fontWeight: 700 }}>
-              {matchedStr}
+              {highlightText(matchedStr, logSearch)}
             </span>
           );
         } else if (matchedStr.endsWith('ms')) {
           parts.push(
             <span key={matchIndex} style={{ color: colors.latency, fontWeight: 700 }}>
-              {matchedStr}
+              {highlightText(matchedStr, logSearch)}
             </span>
           );
         }
@@ -246,19 +261,19 @@ export default function Logs() {
       }
 
       if (lastIndex < msg.length) {
-        parts.push(msg.substring(lastIndex));
+        parts.push(highlightText(msg.substring(lastIndex), logSearch));
       }
 
-      return parts.length > 0 ? parts : msg;
+      return parts.length > 0 ? parts : highlightText(msg, logSearch);
     };
 
     return (
       <Box key={index} sx={{ display: 'flex', fontFamily: 'monospace', fontSize: '0.75rem', py: 0.15, px: 2, '&:hover': { backgroundColor: 'action.hover' } }}>
         <Typography component="span" sx={{ color: colors.timestamp, fontSize: 'inherit', fontFamily: 'inherit', minWidth: '155px', flexShrink: 0 }}>
-          {timestamp}
+          {highlightText(timestamp, logSearch)}
         </Typography>
         <Typography component="span" sx={{ color: levelColor, fontWeight: 700, fontSize: 'inherit', fontFamily: 'inherit', minWidth: '65px', flexShrink: 0 }}>
-          {level}
+          {highlightText(level, logSearch)}
         </Typography>
         <Typography component="span" sx={{ color: colors.defaultText, fontSize: 'inherit', fontFamily: 'inherit', flexGrow: 1, whiteSpace: 'pre-wrap' }}>
           {renderMessage(message)}
