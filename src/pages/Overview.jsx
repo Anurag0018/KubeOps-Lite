@@ -63,7 +63,22 @@ export default function Overview() {
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* Card 1: Total Pods */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.75 }}>
                 <Box sx={{ p: 1, borderRadius: '10px', backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.15)', display: 'flex' }}>
@@ -90,7 +105,22 @@ export default function Overview() {
 
         {/* Card 2: Healthy Pods */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(16, 185, 129, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(16, 185, 129, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#10b981',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.75 }}>
                 <Box sx={{ p: 1, borderRadius: '10px', backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex' }}>
@@ -111,7 +141,22 @@ export default function Overview() {
 
         {/* Card 3: Warnings */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(245, 158, 11, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(245, 158, 11, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#f59e0b',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.75 }}>
                 <Box sx={{
@@ -147,7 +192,22 @@ export default function Overview() {
 
         {/* Card 4: Deployments */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(99, 102, 241, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(99, 102, 241, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#6366f1',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.75 }}>
                 <Box sx={{ p: 1, borderRadius: '10px', backgroundColor: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.15)', display: 'flex' }}>
@@ -169,7 +229,25 @@ export default function Overview() {
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* Left: CPU/Memory Line Chart */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', height: '300px', display: 'flex', flexDirection: 'column' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              height: '300px',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2, pb: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                 <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1.0rem' }}>
@@ -209,13 +287,37 @@ export default function Overview() {
 
         {/* Right: Radial Score Gauge */}
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px', height: '300px', display: 'flex', flexDirection: 'column' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              height: '300px',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
               <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1.0rem', mb: 1 }}>
                 Cluster Health Score
               </Typography>
               {/* Centered Circle progress ring */}
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', flex: 1, my: 0.5 }}>
+                <style>{`
+                  @keyframes drawProgressRing {
+                    from { stroke-dashoffset: ${2 * Math.PI * 80}; }
+                    to { stroke-dashoffset: ${2 * Math.PI * 80 * (1 - 0.94)}; }
+                  }
+                `}</style>
                 <svg width="130" height="130" viewBox="0 0 200 200">
                   <circle cx="100" cy="100" r="80" fill="none" stroke={theme.palette.mode === 'dark' ? '#151926' : 'rgba(0,0,0,0.06)'} strokeWidth="12" />
                   <circle
@@ -229,6 +331,9 @@ export default function Overview() {
                     strokeDashoffset={2 * Math.PI * 80 * (1 - 0.94)}
                     strokeLinecap="round"
                     transform="rotate(-90 100 100)"
+                    style={{
+                      animation: 'drawProgressRing 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+                    }}
                   />
                 </svg>
                 <Box sx={{ position: 'absolute', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

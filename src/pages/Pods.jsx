@@ -95,6 +95,13 @@ export default function Pods() {
 
   return (
     <Box sx={{ p: 3, backgroundColor: 'transparent', width: '100%' }}>
+      <style>{`
+        @keyframes runningPulse {
+          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+          70% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+      `}</style>
       {/* Category and Title header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <Box>
@@ -296,6 +303,7 @@ export default function Pods() {
                           height: '20px',
                           borderRadius: '4px',
                           border: `1px solid ${getStatusColor(pod.status)}25`,
+                          animation: pod.status === 'RUNNING' ? 'runningPulse 2s infinite' : 'none',
                         }}
                       />
                     </TableCell>
@@ -395,7 +403,22 @@ export default function Pods() {
         {/* Right Column: Health Summary & Quick Links */}
         <Grid size={{ xs: 12, lg: 3.5 }} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* Card 1: Cluster Health Summary */}
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(16, 185, 129, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(16, 185, 129, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: '#10b981',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2 }}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '0.5px', display: 'block', mb: 2 }}>
                 CLUSTER HEALTH SUMMARY
@@ -532,7 +555,22 @@ export default function Pods() {
           </Card>
 
           {/* Card 2: Quick Links */}
-          <Card sx={{ backgroundColor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
+          <Card
+            sx={{
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 12px 20px -10px rgba(59, 130, 246, 0.15), 0 4px 20px 0 rgba(0, 0, 0, 0.3)' 
+                  : '0 12px 20px -10px rgba(59, 130, 246, 0.1), 0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                borderColor: 'primary.main',
+              }
+            }}
+          >
             <CardContent sx={{ p: 2 }}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '0.5px', display: 'block', mb: 1.5 }}>
                 QUICK LINKS

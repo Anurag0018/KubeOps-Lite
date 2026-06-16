@@ -222,7 +222,7 @@ export default function Deployments() {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Active Deployments</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5, fontSize: '1.8rem' }}>18</Typography>
               </Box>
-              <AccountTreeRoundedIcon sx={{ color: 'primary.main', opacity: theme.palette.mode === 'dark' ? 0.18 : 0.22, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
+              <AccountTreeRoundedIcon sx={{ color: 'primary.main', opacity: theme.palette.mode === 'dark' ? 0.6 : 0.7, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
             </Box>
             <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#10b981' : '#047857', fontSize: '0.675rem', fontWeight: 700, mt: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <CircleIcon sx={{ fontSize: 6, color: theme.palette.mode === 'dark' ? '#10b981' : '#047857' }} /> All systems operational
@@ -238,7 +238,7 @@ export default function Deployments() {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Failed Deployments</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'error.main', mt: 0.5, fontSize: '1.8rem' }}>0</Typography>
               </Box>
-              <ErrorOutlineRoundedIcon sx={{ color: 'error.main', opacity: theme.palette.mode === 'dark' ? 0.18 : 0.22, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
+              <ErrorOutlineRoundedIcon sx={{ color: 'error.main', opacity: theme.palette.mode === 'dark' ? 0.6 : 0.7, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
             </Box>
             <Chip
               label="-100% from yesterday"
@@ -265,7 +265,7 @@ export default function Deployments() {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Rollouts Today</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5, fontSize: '1.8rem' }}>12</Typography>
               </Box>
-              <AutorenewRoundedIcon sx={{ color: 'text.primary', opacity: theme.palette.mode === 'dark' ? 0.15 : 0.18, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
+              <AutorenewRoundedIcon sx={{ color: 'text.primary', opacity: theme.palette.mode === 'dark' ? 0.5 : 0.55, fontSize: 36, position: 'absolute', right: 12, top: 12 }} />
             </Box>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.675rem', fontWeight: 600, mt: 1.5 }}>
               Last rollout 14m ago
@@ -281,7 +281,7 @@ export default function Deployments() {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.725rem' }}>Average Replicas</Typography>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5, fontSize: '1.8rem' }}>4.2</Typography>
               </Box>
-              <Box sx={{ display: 'flex', gap: '3px', position: 'absolute', right: 16, top: 16, opacity: theme.palette.mode === 'dark' ? 0.15 : 0.18 }}>
+              <Box sx={{ display: 'flex', gap: '3px', position: 'absolute', right: 16, top: 16, opacity: theme.palette.mode === 'dark' ? 0.5 : 0.55 }}>
                 <Box sx={{ width: 4, height: 20, backgroundColor: 'text.primary', borderRadius: 1 }} />
                 <Box sx={{ width: 4, height: 26, backgroundColor: 'text.primary', borderRadius: 1 }} />
                 <Box sx={{ width: 4, height: 16, backgroundColor: 'text.primary', borderRadius: 1 }} />
