@@ -56,9 +56,9 @@ export default function Header() {
     >
       <style>{`
         @keyframes pulseGlow {
-          0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-          70% { box-shadow: 0 0 0 6px rgba(99, 102, 241, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+          0% { box-shadow: 0 0 0 0 var(--pulse-color); }
+          70% { box-shadow: 0 0 0 6px var(--pulse-color-fade); }
+          100% { box-shadow: 0 0 0 0 var(--pulse-color-fade); }
         }
       `}</style>
 
@@ -131,6 +131,10 @@ export default function Header() {
         <Tooltip title="Toggle Cluster Simulator Drawer" arrow>
           <IconButton
             onClick={handleToggleSimulator}
+            style={{
+              '--pulse-color': `${theme.palette.primary.main}66`,
+              '--pulse-color-fade': `${theme.palette.primary.main}00`,
+            }}
             sx={{
               color: storeState.simulatorOpen ? '#ffffff' : 'primary.main',
               backgroundColor: storeState.simulatorOpen ? 'primary.main' : 'background.paper',
