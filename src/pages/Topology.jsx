@@ -126,7 +126,7 @@ export default function Topology() {
     const width = 800;
     const height = 550;
     const centerX = width / 2;
-    const centerY = height / 2 + 55; // Shift center down to give top pods space
+    const centerY = height / 2 + 35; // Shift center down slightly to give top pods space
 
     // Center Node
     newPositions['k8s-master'] = { x: centerX, y: centerY };
@@ -135,7 +135,7 @@ export default function Topology() {
     const nsNodes = graphNodes.filter((n) => n.type === 'namespace');
     nsNodes.forEach((ns, idx) => {
       const angle = (idx / nsNodes.length) * 2 * Math.PI - Math.PI / 2;
-      const radius = 130;
+      const radius = 110; // Scaled down from 130
       const x = centerX + radius * Math.cos(angle);
       const y = centerY + radius * Math.sin(angle);
       newPositions[ns.id] = { x, y };
@@ -145,7 +145,7 @@ export default function Topology() {
       const depNodes = graphNodes.filter((n) => n.type === 'deployment' && n.metadata.ns === nsName);
       depNodes.forEach((dep, dIdx) => {
         const dAngle = angle + ((dIdx - (depNodes.length - 1) / 2) * 0.45);
-        const dRadius = 220;
+        const dRadius = 190; // Scaled down from 220
         const dx = centerX + dRadius * Math.cos(dAngle);
         const dy = centerY + dRadius * Math.sin(dAngle);
         newPositions[dep.id] = { x: dx, y: dy };
@@ -155,7 +155,7 @@ export default function Topology() {
         const podNodes = graphNodes.filter((n) => n.type === 'pod' && n.metadata.deployment === depName);
         podNodes.forEach((pod, pIdx) => {
           const pAngle = dAngle + ((pIdx - (podNodes.length - 1) / 2) * 0.28);
-          const pRadius = 310;
+          const pRadius = 270; // Scaled down from 310
           const px = centerX + pRadius * Math.cos(pAngle);
           const py = centerY + pRadius * Math.sin(pAngle);
           newPositions[pod.id] = { x: px, y: py };
@@ -167,10 +167,10 @@ export default function Topology() {
     const orphanedPods = graphNodes.filter((n) => n.type === 'pod' && !n.metadata.deployment);
     orphanedPods.forEach((pod, oIdx) => {
       const oAngle = (oIdx / orphanedPods.length) * 2 * Math.PI;
-      const oRadius = 260;
+      const oRadius = 220; // Scaled down from 260
       newPositions[pod.id] = {
         x: centerX + oRadius * Math.cos(oAngle),
-        y: centerY - 120 + oRadius * Math.sin(oAngle),
+        y: centerY - 100 + oRadius * Math.sin(oAngle),
       };
     });
 
