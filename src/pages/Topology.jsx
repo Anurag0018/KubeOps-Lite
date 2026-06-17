@@ -125,17 +125,19 @@ export default function Topology() {
     const newPositions = {};
     const width = 800;
     const height = 550;
+    const centerX = width / 2;
+    const centerY = height / 2 + 55; // Shift center down to give top pods space
 
     // Center Node
-    newPositions['k8s-master'] = { x: width / 2, y: height / 2 };
+    newPositions['k8s-master'] = { x: centerX, y: centerY };
 
     // Layout Namespaces in a circle around center
     const nsNodes = graphNodes.filter((n) => n.type === 'namespace');
     nsNodes.forEach((ns, idx) => {
       const angle = (idx / nsNodes.length) * 2 * Math.PI - Math.PI / 2;
       const radius = 130;
-      const x = width / 2 + radius * Math.cos(angle);
-      const y = height / 2 + radius * Math.sin(angle);
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
       newPositions[ns.id] = { x, y };
 
       // Layout Deployments under/around their namespace hub
@@ -144,8 +146,8 @@ export default function Topology() {
       depNodes.forEach((dep, dIdx) => {
         const dAngle = angle + ((dIdx - (depNodes.length - 1) / 2) * 0.45);
         const dRadius = 220;
-        const dx = width / 2 + dRadius * Math.cos(dAngle);
-        const dy = height / 2 + dRadius * Math.sin(dAngle);
+        const dx = centerX + dRadius * Math.cos(dAngle);
+        const dy = centerY + dRadius * Math.sin(dAngle);
         newPositions[dep.id] = { x: dx, y: dy };
 
         // Layout Pods orbiting their deployment
@@ -154,8 +156,8 @@ export default function Topology() {
         podNodes.forEach((pod, pIdx) => {
           const pAngle = dAngle + ((pIdx - (podNodes.length - 1) / 2) * 0.28);
           const pRadius = 310;
-          const px = width / 2 + pRadius * Math.cos(pAngle);
-          const py = height / 2 + pRadius * Math.sin(pAngle);
+          const px = centerX + pRadius * Math.cos(pAngle);
+          const py = centerY + pRadius * Math.sin(pAngle);
           newPositions[pod.id] = { x: px, y: py };
         });
       });
@@ -167,8 +169,8 @@ export default function Topology() {
       const oAngle = (oIdx / orphanedPods.length) * 2 * Math.PI;
       const oRadius = 260;
       newPositions[pod.id] = {
-        x: width / 2 + oRadius * Math.cos(oAngle),
-        y: height / 2 - 120 + oRadius * Math.sin(oAngle),
+        x: centerX + oRadius * Math.cos(oAngle),
+        y: centerY - 120 + oRadius * Math.sin(oAngle),
       };
     });
 
