@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -22,6 +22,11 @@ import {
   Grid,
   Card,
   CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -44,6 +49,64 @@ export default function Pods() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPod, setSelectedPod] = useState(null);
+  const [yamlDialogOpen, setYamlDialogOpen] = useState(false);
+  const [yamlValue, setYamlValue] = useState('');
+  const [yamlError, setYamlError] = useState('');
+
+  const getYamlStr = (pod) => {
+    if (!pod) return '';
+    return pod.yaml || `apiVersion: v1
+kind: Pod
+metadata:
+  name: ${pod.name}
+  namespace: ${pod.namespace}
+  labels:
+    app: ${pod.deployment || 'standalone'}
+spec:
+  containers:
+  - name: container
+    image: custom-image:v1
+    resources:
+      requests:
+        cpu: ${pod.cpu}
+        memory: ${pod.memory}
+status:
+  phase: ${pod.status}
+  hostIP: 192.168.1.101
+  nodeName: ${pod.node}`;
+  };
+
+  useEffect(() => {
+    if (!yamlValue) return;
+    const lines = yamlValue.split('\n');
+    let hasError = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line && !line.startsWith('#')) {
+        if (!line.includes(':') && !line.startsWith('-')) {
+          hasError = true;
+          break;
+        }
+      }
+    }
+    setYamlError(hasError ? 'Warning: invalid YAML syntax (missing colon or key-value format)' : '');
+  }, [yamlValue]);
+
+  const handleEditYamlOpen = () => {
+    if (selectedPod) {
+      setYamlValue(getYamlStr(selectedPod));
+      setYamlDialogOpen(true);
+    }
+    setAnchorEl(null);
+  };
+
+  const handleApplyYaml = () => {
+    if (selectedPod) {
+      clusterStore.updateResourceYaml('pod', selectedPod.name, yamlValue);
+      setYamlDialogOpen(false);
+      setSelectedPod(null);
+    }
+  };
 
   const handleMenuOpen = (event, pod) => {
     setAnchorEl(event.currentTarget);
@@ -52,7 +115,7 @@ export default function Pods() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedPod(null);
+    // Note: don't clear selectedPod immediately because the delete or YAML editor actions need it
   };
 
   const handleDeletePod = () => {
@@ -657,7 +720,6 @@ export default function Pods() {
         </Grid>
       </Grid>
 
-      {/* Actions Context Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -673,6 +735,10 @@ export default function Pods() {
           },
         }}
       >
+        <MenuItem onClick={handleEditYamlOpen} sx={{ gap: 1.5, fontSize: '0.85rem' }}>
+          <DescriptionRoundedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+          Edit YAML
+        </MenuItem>
         <MenuItem onClick={handleMenuClose} sx={{ gap: 1.5, fontSize: '0.85rem' }}>
           <TerminalRoundedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
           View Logs
@@ -682,6 +748,84 @@ export default function Pods() {
           Terminate
         </MenuItem>
       </Menu>
+
+      {/* YAML Manifest Editor Dialog */}
+      <Dialog
+        open={yamlDialogOpen}
+        onClose={() => setYamlDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: '16px',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.05rem', pb: 1 }}>
+          Edit Pod Manifest: {selectedPod?.name}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1.5 }}>
+          {yamlError ? (
+            <Box sx={{ mb: 2, p: 1.25, borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)' }}>
+              <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 600 }}>
+                {yamlError}
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 2, p: 1.25, borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)' }}>
+              <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 600 }}>
+                ✓ Manifest syntax valid
+              </Typography>
+            </Box>
+          )}
+          <TextField
+            multiline
+            rows={14}
+            fullWidth
+            value={yamlValue}
+            onChange={(e) => setYamlValue(e.target.value)}
+            inputProps={{
+              style: {
+                fontFamily: 'monospace',
+                fontSize: '0.75rem',
+                lineHeight: 1.4,
+              },
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: theme.palette.mode === 'dark' ? '#070b13' : '#f8fafc',
+                '& fieldset': { borderColor: 'divider' },
+              },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button
+            onClick={() => setYamlDialogOpen(false)}
+            sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleApplyYaml}
+            variant="contained"
+            disabled={Boolean(yamlError)}
+            sx={{
+              fontWeight: 700,
+              textTransform: 'none',
+              borderRadius: '8px',
+              backgroundColor: 'primary.main',
+              '&:hover': { backgroundColor: 'primary.dark' },
+            }}
+          >
+            Apply Config
+          </Button>
+        </DialogActions>
+      </Dialog>
 
     </Box>
   );

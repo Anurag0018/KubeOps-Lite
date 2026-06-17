@@ -110,6 +110,7 @@ let state = {
   latency: '12ms',
   trafficSpike: false,
   nodeOutage: false,
+  customWidgets: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('kubeops_custom_widgets') || '[]') : [],
 };
 
 let listeners = [];
@@ -546,6 +547,170 @@ export const clusterStore = {
       return {
         events: [newEvent, ...s.events],
         healthScore: Math.max(50, s.healthScore - 4)
+      };
+    });
+  },
+
+  addWidget(widget) {
+    this.setState(s => {
+      const nextWidgets = [...s.customWidgets, { id: Math.random().toString(36).substring(7), ...widget }];
+      localStorage.setItem('kubeops_custom_widgets', JSON.stringify(nextWidgets));
+      return { customWidgets: nextWidgets };
+    });
+  },
+
+  removeWidget(id) {
+    this.setState(s => {
+      const nextWidgets = s.customWidgets.filter(w => w.id !== id);
+      localStorage.setItem('kubeops_custom_widgets', JSON.stringify(nextWidgets));
+      return { customWidgets: nextWidgets };
+    });
+  },
+
+  drainNode(nodeName) {
+    this.setState(s => {
+      const updatedNodes = s.nodes.map(n => {
+        if (n.name === nodeName) {
+          return { ...n, status: 'Draining', cpu: Math.max(10, Math.round(n.cpu / 2)), mem: Math.max(15, Math.round(n.mem / 2)) };
+        }
+        return n;
+      });
+
+      const podsToEvacuate = s.pods.filter(p => p.node === nodeName);
+      
+      const newEvent = {
+        time: 'Now',
+        type: 'Warning',
+        reason: 'DrainTriggered',
+        object: `Node/${nodeName}`,
+        message: `Node ${nodeName} drain triggered. Evacuating ${podsToEvacuate.length} pods.`
+      };
+
+      const updatedPods = s.pods.map(p => {
+        if (p.node === nodeName) {
+          return { ...p, status: 'TERMINATING', cpu: '--', cpuPercent: 0 };
+        }
+        return p;
+      });
+
+      setTimeout(() => {
+        this.setState(curr => {
+          const finishedNodes = curr.nodes.map(n => {
+            if (n.name === nodeName) {
+              return { ...n, status: 'Offline', cpu: 0, mem: 0, slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] };
+            }
+            return n;
+          });
+
+          const otherNodes = finishedNodes.filter(n => n.name !== nodeName && n.status === 'Online').map(n => n.name);
+          const activeNode = otherNodes.length > 0 ? otherNodes[0] : 'node-master-01';
+
+          let activePods = curr.pods.filter(p => !(p.node === nodeName && p.status === 'TERMINATING'));
+
+          const replacements = [];
+          podsToEvacuate.forEach(p => {
+            if (p.deployment && otherNodes.length > 0) {
+              const targetNode = otherNodes[Math.floor(Math.random() * otherNodes.length)];
+              replacements.push({
+                name: `${p.deployment}-${Math.random().toString(36).substring(7)}`,
+                deployment: p.deployment,
+                namespace: p.namespace,
+                status: 'RUNNING',
+                cpu: '120m',
+                cpuPercent: 40,
+                memory: p.memory || '250 Mi',
+                restarts: 0,
+                age: '1s',
+                node: targetNode
+              });
+            }
+          });
+
+          const completedEvent = {
+            time: 'Now',
+            type: 'Normal',
+            reason: 'DrainCompleted',
+            object: `Node/${nodeName}`,
+            message: `Node ${nodeName} drained. Re-allocated ${replacements.length} workloads.`
+          };
+
+          return {
+            nodes: finishedNodes,
+            pods: [...activePods, ...replacements],
+            events: [completedEvent, ...curr.events]
+          };
+        });
+      }, 2000);
+
+      return {
+        nodes: updatedNodes,
+        pods: updatedPods,
+        events: [newEvent, ...s.events]
+      };
+    });
+  },
+
+  updateResourceYaml(type, name, yamlContent) {
+    this.setState(s => {
+      let replicas = null;
+      let status = null;
+
+      const lines = yamlContent.split('\n');
+      lines.forEach(l => {
+        const parts = l.split(':');
+        if (parts.length >= 2) {
+          const key = parts[0].trim().toLowerCase();
+          const val = parts[1].trim();
+          if (key === 'replicas') {
+            replicas = parseInt(val, 10);
+          }
+          if (key === 'status') {
+            status = val;
+          }
+        }
+      });
+
+      let updatedDeployments = [...s.deployments];
+      let updatedPods = [...s.pods];
+
+      if (type === 'deployment') {
+        updatedDeployments = s.deployments.map(d => {
+          if (d.name === name) {
+            if (replicas !== null && replicas !== d.replicasTotal) {
+              setTimeout(() => this.scaleDeployment(name, replicas), 0);
+            }
+            return {
+              ...d,
+              yaml: yamlContent
+            };
+          }
+          return d;
+        });
+      } else if (type === 'pod') {
+        updatedPods = s.pods.map(p => {
+          if (p.name === name) {
+            return {
+              ...p,
+              status: status ? status.toUpperCase() : p.status,
+              yaml: yamlContent
+            };
+          }
+          return p;
+        });
+      }
+
+      const newEvent = {
+        time: 'Now',
+        type: 'Normal',
+        reason: 'ManifestUpdated',
+        object: `${type === 'pod' ? 'Pod' : 'Deployment'}/${name}`,
+        message: `Applied updated manifest configuration for ${name}`
+      };
+
+      return {
+        deployments: updatedDeployments,
+        pods: updatedPods,
+        events: [newEvent, ...s.events]
       };
     });
   }

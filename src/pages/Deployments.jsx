@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -19,6 +19,7 @@ import {
   DialogActions,
   Menu,
   useTheme,
+  TextField,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -37,6 +38,7 @@ import HeightRoundedIcon from '@mui/icons-material/HeightRounded';
 import SyncRoundedIcon from '@mui/icons-material/SyncRounded';
 import SettingsBackupRestoreRoundedIcon from '@mui/icons-material/SettingsBackupRestoreRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import { useClusterStore, clusterStore } from '../store/clusterStore';
 
 export default function Deployments() {
@@ -79,6 +81,69 @@ export default function Deployments() {
     }
     setScaleDialogOpen(false);
     setScalingDep(null);
+  };
+
+  // YAML Dialog States
+  const [yamlDialogOpen, setYamlDialogOpen] = useState(false);
+  const [yamlValue, setYamlValue] = useState('');
+  const [yamlError, setYamlError] = useState('');
+
+  const getYamlStr = (dep) => {
+    if (!dep) return '';
+    return dep.yaml || `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${dep.name}
+  namespace: ${dep.ns}
+spec:
+  replicas: ${dep.replicasTotal}
+  selector:
+    matchLabels:
+      app: ${dep.name}
+  template:
+    metadata:
+      labels:
+        app: ${dep.name}
+    spec:
+      containers:
+      - name: container
+        image: nginx:alpine
+        resources:
+          limits:
+            cpu: ${dep.cpu}
+            memory: ${dep.memory}`;
+  };
+
+  useEffect(() => {
+    if (!yamlValue) return;
+    const lines = yamlValue.split('\n');
+    let hasError = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line && !line.startsWith('#')) {
+        if (!line.includes(':') && !line.startsWith('-')) {
+          hasError = true;
+          break;
+        }
+      }
+    }
+    setYamlError(hasError ? 'Warning: invalid YAML syntax (missing colon or key-value format)' : '');
+  }, [yamlValue]);
+
+  const handleEditYamlOpen = () => {
+    if (activeDep) {
+      setYamlValue(getYamlStr(activeDep));
+      setYamlDialogOpen(true);
+    }
+    setAnchorEl(null);
+  };
+
+  const handleApplyYaml = () => {
+    if (activeDep) {
+      clusterStore.updateResourceYaml('deployment', activeDep.name, yamlValue);
+      setYamlDialogOpen(false);
+      setActiveDep(null);
+    }
   };
 
   const handleRestart = (dep) => {
@@ -650,7 +715,6 @@ export default function Deployments() {
         ))}
       </Grid>
 
-      {/* More Vert Actions Context Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -666,6 +730,10 @@ export default function Deployments() {
           },
         }}
       >
+        <MenuItem onClick={handleEditYamlOpen} sx={{ gap: 1.5, fontSize: '0.8rem', fontWeight: 600 }}>
+          <DescriptionRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+          Edit YAML
+        </MenuItem>
         <MenuItem onClick={() => handleOpenScale(activeDep)} sx={{ gap: 1.5, fontSize: '0.8rem', fontWeight: 600 }}>
           <HeightRoundedIcon sx={{ fontSize: 14, color: '#3b82f6', transform: 'rotate(90deg)' }} />
           Scale Replicas
@@ -760,6 +828,84 @@ export default function Deployments() {
             }}
           >
             Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* YAML Manifest Editor Dialog */}
+      <Dialog
+        open={yamlDialogOpen}
+        onClose={() => setYamlDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: '16px',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.05rem', pb: 1 }}>
+          Edit Deployment Manifest: {activeDep?.name}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1.5 }}>
+          {yamlError ? (
+            <Box sx={{ mb: 2, p: 1.25, borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)' }}>
+              <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 600 }}>
+                {yamlError}
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 2, p: 1.25, borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.15)' }}>
+              <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 600 }}>
+                ✓ Manifest syntax valid
+              </Typography>
+            </Box>
+          )}
+          <TextField
+            multiline
+            rows={14}
+            fullWidth
+            value={yamlValue}
+            onChange={(e) => setYamlValue(e.target.value)}
+            inputProps={{
+              style: {
+                fontFamily: 'monospace',
+                fontSize: '0.75rem',
+                lineHeight: 1.4,
+              },
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: theme.palette.mode === 'dark' ? '#070b13' : '#f8fafc',
+                '& fieldset': { borderColor: 'divider' },
+              },
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button
+            onClick={() => setYamlDialogOpen(false)}
+            sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleApplyYaml}
+            variant="contained"
+            disabled={Boolean(yamlError)}
+            sx={{
+              fontWeight: 700,
+              textTransform: 'none',
+              borderRadius: '8px',
+              backgroundColor: 'primary.main',
+              '&:hover': { backgroundColor: 'primary.dark' },
+            }}
+          >
+            Apply Config
           </Button>
         </DialogActions>
       </Dialog>

@@ -22,6 +22,7 @@ import TerminalRoundedIcon from '@mui/icons-material/TerminalRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import OfflineBoltRoundedIcon from '@mui/icons-material/OfflineBoltRounded';
+import SchemaRoundedIcon from '@mui/icons-material/SchemaRounded';
 import { useClusterStore } from '../store/clusterStore';
 
 const DRAWER_WIDTH = 240;
@@ -33,6 +34,7 @@ const itemColors = {
   pods: { hex: '#10b981', rgba: '16, 185, 129' },
   deployments: { hex: '#f59e0b', rgba: '245, 158, 11' }, // Warm amber
   intelligence: { hex: '#06b6d4', rgba: '6, 182, 212' }, // Neon cyan
+  topology: { hex: '#fb7185', rgba: '251, 113, 133' }, // Rose Pink
   services: { hex: '#0ea5e9', rgba: '14, 165, 233' }, // Sky blue
   events: { hex: '#e11d48', rgba: '225, 29, 72' }, // Vibrant rose
   logs: { hex: '#14b8a6', rgba: '20, 184, 166' }, // Teal
@@ -44,6 +46,7 @@ const menuItems = [
   { text: 'Namespaces', icon: <LayersRoundedIcon />, view: 'namespaces' },
   { text: 'Pods', icon: <DnsRoundedIcon />, view: 'pods' },
   { text: 'Deployments', icon: <AccountTreeRoundedIcon />, view: 'deployments' },
+  { text: 'Cluster Topology', icon: <SchemaRoundedIcon />, view: 'topology' },
   { text: 'AI Intelligence', icon: <OfflineBoltRoundedIcon />, view: 'intelligence' },
   { text: 'Services', icon: <HubRoundedIcon />, view: 'services' },
   { text: 'Events', icon: <FlashOnRoundedIcon />, view: 'events' },

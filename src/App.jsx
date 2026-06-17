@@ -17,6 +17,8 @@ import Services from './pages/Services';
 import Events from './pages/Events';
 import Logs from './pages/Logs';
 import AllIntelligence from './pages/AllIntelligence';
+import Topology from './pages/Topology';
+import KubeTerminal from './components/KubeTerminal';
 import { useClusterStore, clusterStore } from './store/clusterStore';
 
 export default function App() {
@@ -45,6 +47,8 @@ export default function App() {
         return <Logs />;
       case 'intelligence':
         return <AllIntelligence />;
+      case 'topology':
+        return <Topology />;
       default:
         return <Overview />;
     }
@@ -275,6 +279,7 @@ export default function App() {
             </Button>
           </Box>
         </Drawer>
+        <KubeTerminal />
       </Box>
     </ThemeProvider>
   );

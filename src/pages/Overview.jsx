@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -9,6 +9,17 @@ import {
   Button,
   LinearProgress,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  IconButton,
+  TextField,
+  Paper,
 } from '@mui/material';
 import {
   ResponsiveContainer,
@@ -16,6 +27,10 @@ import {
   Line,
   XAxis,
   Tooltip,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
 } from 'recharts';
 import LayersIcon from '@mui/icons-material/Layers';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
@@ -27,7 +42,10 @@ import CircleIcon from '@mui/icons-material/Circle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SecurityIcon from '@mui/icons-material/Security';
 import SyncIcon from '@mui/icons-material/Sync';
-import { useClusterStore } from '../store/clusterStore';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { useClusterStore, clusterStore } from '../store/clusterStore';
 
 // Mock trend metrics for CPU, Memory, and Network health timeline
 const timelineData = [
@@ -48,6 +66,21 @@ const timelineData = [
 export default function Overview() {
   const theme = useTheme();
   const [storeState] = useClusterStore();
+
+  const [widgetModalOpen, setWidgetModalOpen] = useState(false);
+  const [newMetric, setNewMetric] = useState('cpu');
+  const [newChartType, setNewChartType] = useState('area');
+  const [newTitle, setNewTitle] = useState('Custom CPU Metric');
+
+  const handleAddWidget = () => {
+    clusterStore.addWidget({
+      title: newTitle || `Custom ${newMetric.toUpperCase()} Metric`,
+      metric: newMetric,
+      chartType: newChartType,
+    });
+    setWidgetModalOpen(false);
+    setNewTitle('Custom CPU Metric');
+  };
 
   const totalPods = storeState.pods.length;
   const healthyPods = storeState.pods.filter(p => p.status === 'RUNNING').length;
@@ -397,6 +430,175 @@ export default function Overview() {
         </Grid>
       </Grid>
 
+      {/* Custom Metrics Explorer Section */}
+      <Box sx={{ mt: 3, mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+            <SchemaIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+            <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.05rem', letterSpacing: '-0.3px' }}>
+              Custom Prometheus-Style Metrics
+            </Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setWidgetModalOpen(true)}
+            startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              borderColor: 'divider',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '0.725rem',
+              textTransform: 'none',
+              '&:hover': {
+                borderColor: 'primary.main',
+                backgroundColor: 'action.hover',
+              }
+            }}
+          >
+            Add Widget
+          </Button>
+        </Box>
+
+        {storeState.customWidgets && storeState.customWidgets.length > 0 ? (
+          <Grid container spacing={2}>
+            {storeState.customWidgets.map((w) => {
+              const generateMockChartData = (metric) => {
+                const data = [];
+                for (let i = 0; i < 8; i++) {
+                  let val = 20 + Math.random() * 50;
+                  if (metric === 'cpu') val = 30 + Math.random() * 45;
+                  else if (metric === 'memory') val = 50 + Math.random() * 30;
+                  else if (metric === 'network') val = 15 + Math.random() * 60;
+                  else if (metric === 'ingress') val = 100 + Math.random() * 400;
+                  data.push({ time: `12:${i}0`, value: Math.round(val) });
+                }
+                return data;
+              };
+
+              const data = generateMockChartData(w.metric);
+              const isDark = theme.palette.mode === 'dark';
+
+              return (
+                <Grid key={w.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Card
+                    sx={{
+                      backgroundColor: 'background.paper',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '16px',
+                      p: 2.25,
+                      height: '200px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: isDark
+                          ? `0 12px 20px -10px ${theme.palette.primary.main}26, 0 4px 20px 0 rgba(0,0,0,0.3)`
+                          : `0 12px 20px -10px ${theme.palette.primary.main}14, 0 4px 20px 0 rgba(0,0,0,0.05)`,
+                        borderColor: 'primary.main',
+                        '& .delete-btn': { opacity: 1 },
+                      }
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.8rem', letterSpacing: '-0.2px' }}>
+                          {w.title}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
+                          {`${w.metric.toUpperCase()} • ${w.chartType.toUpperCase()}`}
+                        </Typography>
+                      </Box>
+                      <IconButton
+                        className="delete-btn"
+                        size="small"
+                        onClick={() => clusterStore.removeWidget(w.id)}
+                        sx={{
+                          position: 'absolute',
+                          top: 12,
+                          right: 12,
+                          color: 'text.secondary',
+                          opacity: 0,
+                          transition: 'opacity 0.2s ease',
+                          '&:hover': { color: 'error.main' },
+                        }}
+                      >
+                        <DeleteRoundedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Box>
+
+                    <Box sx={{ flexGrow: 1, width: '100%', height: '110px', mt: 1.5 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        {w.chartType === 'line' ? (
+                          <LineChart data={data}>
+                            <XAxis dataKey="time" hide />
+                            <Tooltip contentStyle={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }} labelStyle={{ color: theme.palette.text.secondary }} itemStyle={{ color: theme.palette.text.primary }} />
+                            <Line type="monotone" dataKey="value" stroke={theme.palette.primary.main} strokeWidth={2} dot={false} />
+                          </LineChart>
+                        ) : w.chartType === 'bar' ? (
+                          <BarChart data={data}>
+                            <XAxis dataKey="time" hide />
+                            <Tooltip contentStyle={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }} />
+                            <Bar dataKey="value" fill={theme.palette.primary.main} radius={[3, 3, 0, 0]} />
+                          </BarChart>
+                        ) : (
+                          <AreaChart data={data}>
+                            <defs>
+                              <linearGradient id={`grad-${w.id}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.4}/>
+                                <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
+                            <XAxis dataKey="time" hide />
+                            <Tooltip contentStyle={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }} />
+                            <Area type="monotone" dataKey="value" stroke={theme.palette.primary.main} strokeWidth={2} fill={`url(#grad-${w.id})`} />
+                          </AreaChart>
+                        )}
+                      </ResponsiveContainer>
+                    </Box>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        ) : (
+          <Paper
+            sx={{
+              p: 4,
+              textAlign: 'center',
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '16px',
+              boxShadow: 'none',
+            }}
+          >
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, fontWeight: 500, fontSize: '0.825rem' }}>
+              No custom widgets added. Configure widgets to track custom metrics telemetry dynamically.
+            </Typography>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setWidgetModalOpen(true)}
+              startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.725rem',
+                textTransform: 'none',
+                borderRadius: '8px',
+                backgroundColor: 'primary.main',
+                '&:hover': { backgroundColor: 'primary.dark' }
+              }}
+            >
+              Configure First Widget
+            </Button>
+          </Paper>
+        )}
+      </Box>
+
       {/* Grid Row 3: Active Workloads */}
       <Box sx={{ mt: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -663,21 +865,49 @@ export default function Overview() {
                   }}
                 >
                   {/* Node Header */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                     <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.825rem' }}>
-                        {node.name}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.825rem' }}>
+                          {node.name}
+                        </Typography>
+                        {node.role === 'Worker' && node.status === 'Online' && (
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="error"
+                            onClick={() => clusterStore.drainNode(node.name)}
+                            sx={{
+                              fontSize: '0.6rem',
+                              py: 0,
+                              px: 0.75,
+                              height: '18px',
+                              minWidth: 'auto',
+                              textTransform: 'none',
+                              fontWeight: 800,
+                              borderColor: 'rgba(239, 68, 68, 0.3)',
+                              color: 'error.main',
+                              borderRadius: '4px',
+                              '&:hover': {
+                                backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                                borderColor: 'error.main',
+                              }
+                            }}
+                          >
+                            Drain
+                          </Button>
+                        )}
+                      </Box>
                       <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', fontWeight: 600 }}>
                         {`${node.role} • ${node.ip} • ${node.status}`}
                       </Typography>
                     </Box>
                     <Chip
-                      label={node.status === 'Offline' ? 'OFFLINE' : `${currentCpu}% CPU`}
+                      label={node.status === 'Offline' ? 'OFFLINE' : node.status === 'Draining' ? 'DRAINING' : `${currentCpu}% CPU`}
                       size="small"
                       sx={{
-                        backgroundColor: node.status === 'Offline' ? 'rgba(239, 68, 68, 0.08)' : (currentCpu > 70 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.08)'),
-                        color: node.status === 'Offline' ? 'error.main' : (currentCpu > 70 ? 'error.main' : 'primary.main'),
+                        backgroundColor: node.status === 'Offline' ? 'rgba(239, 68, 68, 0.08)' : (node.status === 'Draining' ? 'rgba(245, 158, 11, 0.08)' : (currentCpu > 70 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.08)')),
+                        color: node.status === 'Offline' ? 'error.main' : (node.status === 'Draining' ? '#f59e0b' : (currentCpu > 70 ? 'error.main' : 'primary.main')),
                         fontSize: '0.625rem',
                         fontWeight: 800,
                         height: '18px',
@@ -743,6 +973,131 @@ export default function Overview() {
           })}
         </Grid>
       </Box>
+
+      {/* Add Custom Metric Widget Dialog */}
+      <Dialog
+        open={widgetModalOpen}
+        onClose={() => setWidgetModalOpen(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: '16px',
+            color: 'text.primary',
+            width: '400px',
+            p: 1.5
+          },
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, pt: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.05rem', color: 'text.primary' }}>
+            Add Custom Metrics Widget
+          </Typography>
+          <IconButton size="small" sx={{ color: 'text.secondary' }} onClick={() => setWidgetModalOpen(false)}>
+            <CloseRoundedIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+
+        <DialogContent sx={{ py: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 500, mb: 1 }}>
+            Configure a new Prometheus-style telemetry card to monitor custom cluster resources dynamically.
+          </Typography>
+
+          <TextField
+            label="Widget Title"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            slotProps={{
+              inputLabel: {
+                style: { fontSize: '0.825rem', fontWeight: 600 }
+              }
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                fontSize: '0.825rem',
+              }
+            }}
+          />
+
+          <FormControl fullWidth size="small">
+            <InputLabel id="metric-select-label" sx={{ fontSize: '0.825rem', fontWeight: 600 }}>Metric Source</InputLabel>
+            <Select
+              labelId="metric-select-label"
+              id="metric-select"
+              value={newMetric}
+              label="Metric Source"
+              onChange={(e) => {
+                const val = e.target.value;
+                setNewMetric(val);
+                // Auto update title placeholder if user hasn't typed a custom one
+                if (newTitle.startsWith('Custom ') || newTitle === '') {
+                  setNewTitle(`Custom ${val.toUpperCase()} Metric`);
+                }
+              }}
+              sx={{ borderRadius: '8px', fontSize: '0.825rem' }}
+            >
+              <MenuItem value="cpu" sx={{ fontSize: '0.825rem' }}>CPU Usage (%)</MenuItem>
+              <MenuItem value="memory" sx={{ fontSize: '0.825rem' }}>Memory Allocation (%)</MenuItem>
+              <MenuItem value="network" sx={{ fontSize: '0.825rem' }}>Network Latency (ms)</MenuItem>
+              <MenuItem value="ingress" sx={{ fontSize: '0.825rem' }}>Ingress Requests/sec</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth size="small">
+            <InputLabel id="chart-type-select-label" sx={{ fontSize: '0.825rem', fontWeight: 600 }}>Chart Type</InputLabel>
+            <Select
+              labelId="chart-type-select-label"
+              id="chart-type-select"
+              value={newChartType}
+              label="Chart Type"
+              onChange={(e) => setNewChartType(e.target.value)}
+              sx={{ borderRadius: '8px', fontSize: '0.825rem' }}
+            >
+              <MenuItem value="area" sx={{ fontSize: '0.825rem' }}>Area Chart</MenuItem>
+              <MenuItem value="line" sx={{ fontSize: '0.825rem' }}>Line Chart</MenuItem>
+              <MenuItem value="bar" sx={{ fontSize: '0.825rem' }}>Bar Chart</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, pb: 2, display: 'flex', gap: 1 }}>
+          <Button
+            onClick={() => setWidgetModalOpen(false)}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 700,
+              textTransform: 'none',
+              fontSize: '0.725rem'
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddWidget}
+            variant="contained"
+            size="small"
+            sx={{
+              backgroundColor: 'primary.main',
+              color: '#ffffff',
+              fontWeight: 700,
+              textTransform: 'none',
+              fontSize: '0.725rem',
+              borderRadius: '8px',
+              px: 2,
+              '&:hover': {
+                backgroundColor: 'primary.dark'
+              }
+            }}
+          >
+            Add Widget
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
